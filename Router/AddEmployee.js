@@ -3,12 +3,12 @@ const router = express.Router();
 const Employee = require('../Model/AddEmployee')
 
 
-// To add new employee
+// To get/view all employees
 router.get('/get', async (req, res) => {  
     try {
         const results = await Employee.find();
         res.json(results);
-        console.log( "result in get" ,results )
+        // console.log( "result in get" ,results )
     } catch (e) {
         res.status(400).json({ message: e.message });
         console.log(e);
@@ -17,13 +17,14 @@ router.get('/get', async (req, res) => {
 })
 
 
-// To get/view all employees
+
+// To add new employee
 router.post('/add', async (req, res) => { 
     try {
         let Employee_data = await Employee.create({
             ...req.body
         });
-           console.log("Employee_data" ,Employee_data)
+        //    console.log("Employee_data" ,Employee_data)
         res.status(201).json(Employee_data);
     } catch (e) {
         res.status(400).json({ message: e.message });
