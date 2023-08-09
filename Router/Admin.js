@@ -5,6 +5,10 @@ const { body, validationResult } = require("express-validator");
 const Admin = require("../Model/Admin");
 const jwt = require("jsonwebtoken");
 const secret = "SECRET";
+const mongoose = require("mongoose")
+
+
+
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
@@ -33,6 +37,7 @@ router.post(
           const salt = await bcrypt.genSalt(12);
           bcrypt.hash(req.body.password, salt, async (err, hash) => {
             await Admin.create({
+              name:req.body.name,
               email: req.body.email,
               password: hash,
             });
@@ -98,6 +103,41 @@ router.post("/login", async (req, res) => {
     });
   }
 });
+ 
+// getting name for rendering in sidebar 
+router.get('/get/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid ObjectId format' });
+    }
+
+    const adminData = await Admin.findOne({ _id: id });
+
+    if (adminData) {
+      res.json(adminData);
+    } else {
+      res.status(404).json({ message: 'Admin not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+//getting all admin
+router.get('/getAdmin', async (req, res) => {  
+  try {
+      const results = await Admin.find();
+      res.json(results);
+      // console.log( "result in get" ,results )
+  } catch (e) {
+      res.status(400).json({ message: e.message });
+      console.log(e);
+  }
+ 
+})
 
 module.exports = router;

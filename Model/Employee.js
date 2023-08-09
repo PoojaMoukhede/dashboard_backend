@@ -1,6 +1,7 @@
 const mongooose = require("mongoose");
 
 const employeeSchema = new mongooose.Schema({
+  employee_id: String,
   id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   email: { type: String, required: true },
@@ -14,4 +15,4 @@ const employeeSchema = new mongooose.Schema({
 
 const Employee = mongooose.model("employees", employeeSchema);
 
-module.exports = Employee;
+module.exports = Employee; //not in use

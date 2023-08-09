@@ -1,6 +1,7 @@
 const mongooose = require('mongoose')
 
 const employeeSchema = new mongooose.Schema({
+    // employee_id: Number,
     Emp_name: { type: String},
     Emp_email: { type: String ,unique: true},
     Emp_contact_No: { type: String},
