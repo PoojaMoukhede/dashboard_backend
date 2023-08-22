@@ -30,6 +30,8 @@ app.use('/', m_route);
 
 app.get('/', function (req, res) {
   res.send('Hello World')
+  console.log("Browser request")
+  
 })
 
 app.listen(port,()=>{console.log(`server is up on port ${port}`)});

@@ -53,8 +53,9 @@ router.put('/putEmployee/:id', async (req, res) => {
 
   try {
       const data = req.body;
-      const employee = await Employee.updateOne({ _id: req.params.id }, data);
+      const employee = await Employee.findOneAndUpdate({ _id: req.params.id }, data);
       res.json({ result: employee });
+
   }
   catch (e) {
       res.status(400).json({ message: e.message });
