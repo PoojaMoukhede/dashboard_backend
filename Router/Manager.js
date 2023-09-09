@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const Manager = require('../Model/Manager')
 const validator = require('validator');
-
+const multer = require('multer');
+const xlsx = require('xlsx');
+const upload = multer({ dest: 'uploads/' })
 
 // To get/view all Managers
 router.get('/getmanager', async (req, res) => {  
@@ -65,6 +67,29 @@ router.delete("/delete/:id", async (req, res) => {
     res.send("Manager's data has been Deleted");
     
 })
+
+
+// for importing file and save data into database
+router.post('/import-data', upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+  
+      const workbook = xlsx.readFile(req.file.path);
+      const sheetName = workbook.SheetNames[0]; // Assuming data is in the first sheet
+      const importedData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  
+      await Manager.insertMany(importedData);
+  
+      res.status(200).json({ message: 'Data imported successfully' });
+    } catch (error) {
+      console.error('Error importing data:', error);
+      res.status(500).json({ message: 'Error importing data' });
+    }
+  });
+
+
 
 
 module.exports= router

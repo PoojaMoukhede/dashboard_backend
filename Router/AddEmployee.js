@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const Employee = require('../Model/AddEmployee')
+const multer = require('multer');
+const xlsx = require('xlsx');
+const upload = multer({ dest: 'uploads/' })
 
 
 // To get/view all employees
@@ -28,26 +31,7 @@ router.post('/add', async (req, res) => {
         res.status(400).json({ message: e.message });
     }
    
-})
-// try {
-//     const { email } = req.body;
-
-//     if (!validator.isEmail(email)) {
-//         return res.status(400).json({ message: 'Invalid email format' });
-//     }
-
-//     const existingEmployee = await Employee.findOne({ email });
-
-//     if (existingEmployee) {
-//         return res.status(400).json({ message: 'Email already exists' });
-//     }
-
-//     const newEmployee = await Employee.create({
-//         ...req.body
-//     });
-
-//     res.status(201).json(newEmployee);
-// }  
+}) 
 
 router.put('/putEmployee/:id', async (req, res) => {
 
@@ -70,6 +54,32 @@ router.delete("/deleteEmployee/:id", async (req, res) => {
   res.send("Employee's data has been Deleted");
   
 })
+
+// for importing file and save data into database
+router.post('/importdata', upload.single('file'), async (req, res) => {
+    try {
+        console.log("inside importdata backend")
+      if (!req.file) {
+        console.log("No file uploaded")
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+  
+      const workbook = xlsx.readFile(req.file.path);
+      console.log(`Workbook : ${workbook}`)
+      const sheetName = workbook.SheetNames[0]; // Assuming data is in the first sheet
+      console.log(`sheetName : ${sheetName}`)
+      const importedData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+      console.log(`importedData : ${importedData}`)
+  
+      await Manager.insertMany(importedData);
+      console.log(`Manager : ${Manager}`)
+      
+      res.status(200).json({ message: 'Data imported successfully' });
+    } catch (error) {
+      console.error('Error importing data:', error);
+      res.status(500).json({ message: 'Error importing data' });
+    }
+  });
 
 
 module.exports = router;
