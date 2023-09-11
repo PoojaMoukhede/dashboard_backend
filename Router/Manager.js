@@ -78,25 +78,6 @@ router.delete("/delete/:id", async (req, res) => {
 })
 
 
-// // for importing file and save data into database
-// router.post('/import-data', upload.single('file'), async (req, res) => {
-//     try {
-//       if (!req.file) {
-//         return res.status(400).json({ message: 'No file uploaded' });
-//       }
-  
-//       const workbook = xlsx.readFile(req.file.path);
-//       const sheetName = workbook.SheetNames[0]; // Assuming data is in the first sheet
-//       const importedData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
-  
-//       await Manager.insertMany(importedData);
-  
-//       res.status(200).json({ message: 'Data imported successfully' });
-//     } catch (error) {
-//       console.error('Error importing data:', error);
-//       res.status(500).json({ message: 'Error importing data' });
-//     }
-//   });
 router.post('/importmanager', upload.single('file'), async (req, res) => {
     try {
         console.log("inside importdata backend")
