@@ -1,12 +1,13 @@
+// const { toString } = require('express-validator/src/utils');
 const mongooose = require('mongoose');
 
 const managerSchema = new mongooose.Schema({
     name:{ type: String},
-    email: { type: String, required: true, unique: true },
+    email: { type: String},
     contact_no: { type: String },
     city:{type: String },
     state:{type: String },
-
+    blood_group:{type: String }
 })
 
 const Manager = mongooose.model('managers', managerSchema);

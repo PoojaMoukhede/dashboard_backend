@@ -66,13 +66,13 @@ router.post('/importdata', upload.single('file'), async (req, res) => {
   
       const workbook = xlsx.readFile(req.file.path);
       console.log(`Workbook : ${workbook}`)
-      const sheetName = workbook.SheetNames[0]; // Assuming data is in the first sheet
+      const sheetName = workbook.SheetNames; // Assuming data is in the first sheet
       console.log(`sheetName : ${sheetName}`)
       const importedData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
       console.log(`importedData : ${importedData}`)
   
-      await Manager.insertMany(importedData);
-      console.log(`Manager : ${Manager}`)
+      await Employee.insertMany(importedData);
+      // console.log(`Employee : ${Employee}`)
       
       res.status(200).json({ message: 'Data imported successfully' });
     } catch (error) {
@@ -80,6 +80,7 @@ router.post('/importdata', upload.single('file'), async (req, res) => {
       res.status(500).json({ message: 'Error importing data' });
     }
   });
+
 
 
 module.exports = router;
