@@ -12,12 +12,7 @@ const upload = multer({ storage: storage });
 // Both Checked
 // GET all clearances
 router.get("/form", async (req, res) => {
-  // try {
-  //   const clearances = await Clearance.find();
-  //   res.json(clearances);
-  // } catch (err) {
-  //   res.status(500).json({ message: err.message });
-  // }
+
   if (req.headers.token !== null) {
         jwt.verify(req.headers.token, secret, (err, user) => {
           if (err) console.log(err.message);

@@ -9,13 +9,7 @@ router.use(express.urlencoded({ extended: true }));
 
 // Both Checked
 router.get('/getcomplaint', async (req, res) => {  
-    // try {
-    //     const results = await Complaint.find();
-    //     res.json(results);
-    // } catch (e) {
-    //     res.status(400).json({ message: e.message });
-    //     console.log(e);
-    // }
+
     if (req.headers.token !== null) {
         jwt.verify(req.headers.token, secret, (err, user) => {
           if (err) console.log(err.message);
