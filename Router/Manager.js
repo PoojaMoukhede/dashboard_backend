@@ -19,29 +19,25 @@ router.get('/getmanager', async (req, res) => {
    
 })
 
+router.get('/getmanager/:id', async (req, res) => {  
+    const managerId = req.params.id;
+    try {
+        const manager = await Manager.findById(managerId);
+
+        if (!manager) {
+            return res.status(404).json({ message: 'Manager not found' });
+        }
+
+        res.json(manager);
+    } catch (e) {
+        res.status(400).json({ message: e.message });
+        console.error(e);
+    }
+});
+
+
 // To add new Manager
 router.post('/addmanager', async (req, res) => { 
-    // try {
-    //     const { email } = req.body;
-
-    //     if (!validator.isEmail(email)) {
-    //         return res.status(400).json({ message: 'Invalid email format' });
-    //     }
-
-    //     const existingManager = await Manager.findOne({ email });
-
-    //     if (existingManager) {
-    //         return res.status(400).json({ message: 'Email already exists' });
-    //     }
-
-    //     const newManager = await Manager.create({
-    //         ...req.body
-    //     });
-
-    //     res.status(201).json(newManager);
-    // } catch (e) {
-    //     res.status(400).json({ message: e.message });
-    // }
     try {
         let Manager_data = await Manager.create({
             ...req.body

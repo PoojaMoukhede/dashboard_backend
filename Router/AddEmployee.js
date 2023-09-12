@@ -19,6 +19,22 @@ router.get('/get', async (req, res) => {
    
 })
 
+router.get('/getemployee/:id', async (req, res) => {  
+  const employeeId = req.params.id;
+  try {
+      const employee = await Employee.findById(employeeId);
+
+      if (!employee) {
+          return res.status(404).json({ employee: 'Employee not found' });
+      }
+
+      res.json(employee);
+  } catch (e) {
+      res.status(400).json({ message: e.message });
+      console.error(e);
+  }
+});
+
 // To add new employee
 router.post('/add', async (req, res) => { 
     try {
