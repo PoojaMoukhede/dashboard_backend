@@ -4,9 +4,9 @@ const Location = require("../../Model/Android/Location")
 const jwt = require("jsonwebtoken")
 const secret ="SECRET"
 // import zipy from 'zipyai';
-const zipy = require("zipyai")
+// const zipy = require("zipyai")
 
-zipy.init('b568edaa');
+// zipy.init('b568edaa');
 
 
 router.use(express.json());
