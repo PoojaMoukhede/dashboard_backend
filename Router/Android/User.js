@@ -22,14 +22,16 @@ router.post(
     try {
       const repeatedEmail = await User.find({ email: req.body.email });
       if (repeatedEmail.length === 0) {
+       
         const errors = validationResult(req);
+        // console.log("Data from anddroid",res)
         if (!errors.isEmpty()) {
           res.status(400).json({
             status: "Failed By Validator",
             message: errors.array(),
           });
         } else {
-          const { password, confirm_password } = req.body;
+          const { password, confirm_password } = req.body; 
           if (password != confirm_password)
             return res.status(400).json({ message: "password doesnot match" });
 
@@ -39,7 +41,7 @@ router.post(
               name:req.body.name,
               email: req.body.email,
               password: hash,
-              Emp_ID:req.body.Emp_ID
+              // Emp_ID:req.body.Emp_ID
             });
           });
           res.status(200).json({
@@ -52,7 +54,8 @@ router.post(
           status: "Failed",
           error: "User Already Exists",
         });
-      }  console.log(req.body)
+      } 
+       console.log("data from android",req.body)
     } catch (error) {
       res.status(500).json({
         status: "Failed",

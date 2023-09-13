@@ -73,6 +73,14 @@ router.delete("/delete/:id", async (req, res) => {
     
 })
 
+router.delete("/deleteAll", async (req, res) => {
+    const selectedUser= req.body._id;
+    const Manager_data = await Manager.deleteMany({ _id: selectedUser });
+    res.send("Manager's data has been Deleted");
+    
+})
+
+
 
 router.post('/importmanager', upload.single('file'), async (req, res) => {
     try {

@@ -70,6 +70,13 @@ router.delete("/deleteEmployee/:id", async (req, res) => {
   res.send("Employee's data has been Deleted");
   
 })
+// router.delete("/deleteEmployee", async (req, res) => {
+//   const ID = req.params.id;
+//   const employee = await Employee.({ _id: ID });
+//   res.send("Employee's data has been Deleted");
+  
+// })
+
 
 // for importing file and save data into database
 router.post('/importdata', upload.single('file'), async (req, res) => {

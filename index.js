@@ -5,6 +5,7 @@ const  bodyParser = require('body-parser');
 const route = require('./Router/Admin');
 const e_route = require('./Router/AddEmployee');
 const m_route = require('./Router/Manager');
+const event_route = require("./Router/Event")
 
 //Android routing
 const Android_user = require('./Router/Android/User')
@@ -37,6 +38,8 @@ app.use(bodyParser.json());
 app.use('/', route);
 app.use('/', e_route);
 app.use('/', m_route);
+app.use('/', event_route);
+
 
 // Android
 app.use('/', Android_user);
