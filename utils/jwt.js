@@ -14,14 +14,14 @@ module.exports =  generateTokens =(user)=> {
     }
 }
   // Function to verify the access token
-module.exports =  verifyAccessToken=(accessToken)=> {
-    try {
+// module.exports =  verifyAccessToken=(accessToken)=> {
+//     try {
   
-      const decoded = jwt.verify(accessToken.split(" ")[1], config.jwtSecret);
-      // const decoded = jwt.verify(accessToken, config.jwtSecret);
-      return decoded.user;
-    } catch (err) {
+//       const decoded = jwt.verify(accessToken.split(" ")[1], config.jwtSecret);
+//       // const decoded = jwt.verify(accessToken, config.jwtSecret);
+//       return decoded.user;
+//     } catch (err) {
   
-        throw new Error(err);
-  }
-}
+//         throw new Error(err);
+//   }
+// }

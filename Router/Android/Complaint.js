@@ -3,6 +3,7 @@ const router = express.Router();
 const Complaint = require("../../Model/Android/Complaint")
 const jwt = require("jsonwebtoken")
 const secret ="SECRET"
+const User = require("../../Model/Android/User")
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
@@ -34,47 +35,42 @@ router.get('/getcomplaint', async (req, res) => {
         });
       }
    
-})
+}) 
 
-router.post('/complaint', async (req, res) => { 
-    // try {
-    //     const complaint = await Complaint.create({
-    //         ...req.body
-    //     });
-    //     res.status(201).json(complaint);
-    // } catch (e) {
-    //     res.status(400).json({ message: e.message });
-    // }
-    jwt.verify(req.headers.token, secret, (err, user) => {
-        if (err) console.log(err.message);
-        req.user = user.results;
-      });
-      try {
-        let results = await Complaint.find({ userRef: req.user }); // Use let here
-        if (results.length > 1) {
-            results = await Complaint.updateOne(
-              { userRef: req.user },
-              {
-                $push: {
-                  Message: req.body,
-                },
-              }
-            );
-          } else {
-            results = await Complaint.create({
-              Message: req.body,
-              userRef: req.user,
-            });
-          }
-          res.status(200).json({
-            status: "Success",
-            message: results,
-          });
-    } catch (e) {
-        res.status(400).json({ message: e.message });
-        console.log(e);
-    }
-  });
+// router.post('/complaint', async (req, res) => { 
+//   try {
+//     const decoded = jwt.verify(req.headers.token, secret);
+//     const empId = decoded.Emp_ID; 
+
+//     const user = await User.findOne({ Emp_ID: empId });
+//         console.log(`user : ${user}`)
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+//     let complaint_user = await Complaint.findOne({ userRef: user._id });
+//     console.log(`complaint_user : ${complaint_user}`)
+ 
+//     if (complaint_user) {
+  
+//       complaint_user.Message.push(req.body);
+//       await complaint_user.save();
+//     } else {
+//       complaint_user = new Complaint({
+//         Message: [req.body],
+//         userRef: user._id,
+//       });
+//       await complaint_user.save();
+//     }
+
+//     res.status(200).json({
+//       status: "Success",
+//       message: "complaint_user added successfully",
+//     });
+//   } catch (e) {
+//     res.status(400).json({ message: e.message });
+//     console.log(e);
+//   }
+//   });
 
    
 module.exports= router

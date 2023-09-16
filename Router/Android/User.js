@@ -41,7 +41,7 @@ router.post(
               name:req.body.name,
               email: req.body.email,
               password: hash,
-              // Emp_ID:req.body.Emp_ID
+              Emp_ID:req.body.Emp_ID
             });
           });
           res.status(200).json({
@@ -67,46 +67,97 @@ router.post(
 );
 
 //login
+// router.post("/emplogin", async (req, res) => {
+//   const email = req.body.email;
+//   const password = req.body.password;
+//   const UserData = await User.findOne({ email: email });
+//   if (UserData != null) {
+//     try {
+//       const result = await bcrypt.compare(password, UserData.password);
+//       if (result) {
+//         const token = jwt.sign(
+//           {
+//             exp: Math.floor(Date.now() / 1000) + 60 * 60, // Fix: Divide by 1000 to get seconds
+//             User: UserData._id,
+//           },
+//           secret
+//         );
+//         // const token = jwt.sign({ Emp_ID: User.Emp_ID }, secret, { expiresIn: '1h' });
+//         res.status(200).json({
+//           Status: "Successful",
+//           token: token,
+//         });
+//       } else {
+//         res.status(400).json({
+//           status: "failed",
+//           message: "Wrong password",
+//         });
+//       }
+//     } catch (err) {
+//       console.log('Comparison error: ', err);
+//       res.status(500).json({
+//         status: "error",
+//         message: "Internal server error",
+//       });
+//     }
+//   } else {
+//     res.status(400).json({
+//       status: "failed",
+//       message: "No user Found",
+//     });
+//   }
+// });
+ 
 router.post("/emplogin", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const UserData = await User.findOne({ email: email });
-  if (UserData != null) {
-    try {
-      const result = await bcrypt.compare(password, UserData.password);
-      if (result) {
+
+  try {
+    // Find the user by email
+    const userData = await User.findOne({ email: email });
+
+    if (userData) {
+      // Compare the provided password with the hashed password from the database
+      const passwordMatch = await bcrypt.compare(password, userData.password);
+
+      if (passwordMatch) {
+        // Generate a JWT token
         const token = jwt.sign(
           {
-            exp: Math.floor(Date.now() / 1000) + 60 * 60, // Fix: Divide by 1000 to get seconds
-            User: UserData._id,
+            User: userData._id,
           },
-          secret
+          secret,
+          { expiresIn: "1h" }
         );
+
+        // Respond with a success message and the token
         res.status(200).json({
-          Status: "Successful",
+          status: "Successful",
           token: token,
         });
       } else {
-        res.status(400).json({
+        // Incorrect password
+        res.status(401).json({
           status: "failed",
           message: "Wrong password",
         });
       }
-    } catch (err) {
-      console.log('Comparison error: ', err);
-      res.status(500).json({
-        status: "error",
-        message: "Internal server error",
+    } else {
+      // User not found
+      res.status(404).json({
+        status: "failed",
+        message: "No user found",
       });
     }
-  } else {
-    res.status(400).json({
-      status: "failed",
-      message: "No user Found",
+  } catch (err) {
+    console.error("Error during login:", err);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
     });
   }
 });
- 
+
 //getting all user
 router.get('/empdata', async (req, res) => {  
     try {
