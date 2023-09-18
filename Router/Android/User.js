@@ -160,6 +160,7 @@ router.post("/emplogin", async (req, res) => {
 
 //getting all user
 router.get('/empdata', async (req, res) => {  
+  console.log("get request by android")
     try {
         const results = await User.find();
         res.json(results);
