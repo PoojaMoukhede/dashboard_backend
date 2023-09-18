@@ -12,6 +12,8 @@ router.use(express.urlencoded({ extended: true }));
 
 // Both Checked
 router.get('/getlocation', async (req, res) => {  
+  console.log("hello Location get call")
+
     if (req.headers.token !== null) {
         jwt.verify(req.headers.token, secret, (err, user) => {
           if (err) console.log(err.message);
@@ -40,6 +42,7 @@ router.get('/getlocation', async (req, res) => {
 
 
 router.get("/getlocation/:Emp_ID", async (req, res) => {
+  console.log("hello Location get Emp_ID call")
   try {
     const empId = req.params.Emp_ID;
     const user = await User.findOne({ Emp_ID: empId });
@@ -64,6 +67,7 @@ router.get("/getlocation/:Emp_ID", async (req, res) => {
 
 
 router.post('/location', async (req, res) => { 
+  console.log("hello Location post call")
     try {
       const decoded = jwt.verify(req.headers.token, secret);
       console.log(decoded)

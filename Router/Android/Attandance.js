@@ -7,6 +7,7 @@ const User = require("../../Model/Android/User")
 
 // Both checked
 router.get('/getAttandance', async (req, res) => {  
+  console.log("hello attandance")
     try {
       const attendanceRecords = await Attandance.find();
   
@@ -27,6 +28,8 @@ router.get('/getAttandance', async (req, res) => {
 
 
 router.post('/addAttandance', async (req, res) => { 
+  console.log("hello attandance post call")
+
   try {
     const decoded = jwt.verify(req.headers.token, secret);
     console.log(decoded)
@@ -65,6 +68,8 @@ router.post('/addAttandance', async (req, res) => {
 
 
 router.get("/getAttandance/:Emp_ID", async (req, res) => {
+  console.log("hello attandance get ID call")
+
   try {
     const empId = req.params.Emp_ID;
     const user = await User.findOne({ Emp_ID: empId });

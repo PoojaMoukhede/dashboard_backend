@@ -10,6 +10,7 @@ router.use(express.urlencoded({ extended: true }));
 
 // Both Checked
 router.get('/getcomplaint', async (req, res) => {  
+  console.log("hello Complaint post call")
 
     if (req.headers.token !== null) {
         jwt.verify(req.headers.token, secret, (err, user) => {
@@ -39,6 +40,8 @@ router.get('/getcomplaint', async (req, res) => {
 
 
 router.get("/getcomplaint/:Emp_ID", async (req, res) => {
+  console.log("hello Complaint get Emp_ID call")
+
   try {
     const empId = req.params.Emp_ID;
     const user = await User.findOne({ Emp_ID: empId });
@@ -97,6 +100,8 @@ router.get("/getcomplaint/:Emp_ID", async (req, res) => {
 //   });
 
 router.post('/complaint', async (req, res) => { 
+  console.log("hello Complaint post call")
+
   try {
     const decoded = jwt.verify(req.headers.token, secret);
     console.log(decoded)

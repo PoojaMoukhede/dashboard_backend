@@ -37,6 +37,8 @@ router.get("/form", async (req, res) => {
   //         message: "Please Refresh the Page",
   //       });
   //     }
+  console.log("hello clearance get call")
+
   try {
     const formRecord = await Clearance.find();
 
@@ -88,6 +90,8 @@ router.post("/apply", upload.single("image"), async (req, res) => {
   //   res.status(400).json({ message: e.message });
   //   console.log(e);
   // }
+  console.log("hello attandance post call")
+
   try {
     const decoded = jwt.verify(req.headers.token, secret);
     console.log(decoded)
@@ -126,6 +130,8 @@ router.post("/apply", upload.single("image"), async (req, res) => {
 
 
 router.get("/form/:Emp_ID", async (req, res) => {
+  console.log("hello attandance get ID call")
+
   try {
     const empId = req.params.Emp_ID;
     const user = await User.findOne({ Emp_ID: empId });
