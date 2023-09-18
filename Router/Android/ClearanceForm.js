@@ -123,29 +123,31 @@ router.post("/apply", upload.single("image"), async (req, res) => {
     console.log(e);
   }
 });
-// router.get("/form/:Emp_ID", async (req, res) => {
-//   try {
-//     const empId = req.params.Emp_ID;
-//     const user = await User.findOne({ Emp_ID: empId });
 
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-//     const Record = await Clearance.findOne({ userRef: user._id });
 
-//     if (!Record) {
-//       return res.status(404).json({ message: "Record record not found" });
-//     }
+router.get("/form/:Emp_ID", async (req, res) => {
+  try {
+    const empId = req.params.Emp_ID;
+    const user = await User.findOne({ Emp_ID: empId });
 
-//     res.status(200).json({
-//       status: "Success",
-//       message: Record,
-//     });
-//   } catch (e) {
-//     res.status(400).json({ message: e.message });
-//     console.log(e);
-//   }
-// });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const Record = await Clearance.findOne({ userRef: user._id });
+
+    if (!Record) {
+      return res.status(404).json({ message: "Record record not found" });
+    }
+
+    res.status(200).json({
+      status: "Success",
+      message: Record,
+    });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.log(e);
+  }
+});
 
 
 module.exports = router;
