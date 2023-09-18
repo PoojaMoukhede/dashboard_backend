@@ -142,6 +142,7 @@ router.post("/emplogin", async (req, res) => {
           status: "Successful",
           token: token,
         });
+        console.log(`crediantial : ${userData}`)
       } else {
         // Incorrect password
         res.status(401).json({
