@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Manager = require('../Model/Manager')
+const Manager = require('../../Model/Web/Manager')
 const validator = require('validator');
 const multer = require('multer');
 const xlsx = require('xlsx');

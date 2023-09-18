@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Employee = require('../Model/AddEmployee')
+const Employee = require('../../Model/Web/AddEmployee')
 const multer = require('multer');
 const xlsx = require('xlsx');
 const upload = multer({ dest: 'uploads/' })

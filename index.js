@@ -2,10 +2,10 @@ const express = require('express');
 const app = express();
 const mongoose = require("mongoose");
 const  bodyParser = require('body-parser');
-const route = require('./Router/Admin');
-const e_route = require('./Router/AddEmployee');
-const m_route = require('./Router/Manager');
-const event_route = require("./Router/Event")
+const route = require('./Router/Web/Admin');
+const e_route = require('./Router/Web/AddEmployee');
+const m_route = require('./Router/Web/Manager');
+const event_route = require("./Router/Web/Event")
 
 //Android routing
 const Android_user = require('./Router/Android/User')

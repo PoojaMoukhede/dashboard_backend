@@ -37,6 +37,30 @@ router.get('/getcomplaint', async (req, res) => {
    
 }) 
 
+
+router.get("/getcomplaint/:Emp_ID", async (req, res) => {
+  try {
+    const empId = req.params.Emp_ID;
+    const user = await User.findOne({ Emp_ID: empId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const complaint = await Complaint.findOne({ userRef: user._id });
+
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint record not found" });
+    }
+    res.status(200).json({
+      status: "Success",
+      message: complaint,
+    });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.log(e);
+  }
+});
+
 // router.post('/complaint', async (req, res) => { 
 //   try {
 //     const decoded = jwt.verify(req.headers.token, secret);
@@ -76,27 +100,26 @@ router.post('/complaint', async (req, res) => {
   try {
     const decoded = jwt.verify(req.headers.token, secret);
     console.log(decoded)
-    const empId = decoded.User; // Assuming JWT  contains Emp_ID
+    const empId = decoded.User; 
  console.log(`empID ------ ${empId}`)
-    // Find the user by Emp_ID to ensure it exists
+  
     const user = await User.findOne({ _id: empId });
     console.log(`user ------ ${user}`)
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    let attendance = await Complaint.findOne({ userRef: user._id });
+    let complaint = await Complaint.findOne({ userRef: user._id });
 
-    if (attendance) {
-      // If attendance record exists, update it
-      attendance.Message.push(req.body);
-      await attendance.save();
+    if (complaint) {
+      complaint.Message.push(req.body);
+      await complaint.save();
     } else {
-      attendance = new Complaint({
+      complaint = new Complaint({
         Message: [req.body],
-        userRef: user._id, // Ensure that user._id is correctly assigned
+        userRef: user._id,
       });
-      await attendance.save();
+      await complaint.save();
     }
 
     res.status(200).json({

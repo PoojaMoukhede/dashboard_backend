@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Event = require('../Model/Event')
+const Event = require('../../Model/Web/Event')
 
 
 router.get('/getevent', async (req, res) => {  

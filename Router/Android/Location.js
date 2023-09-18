@@ -3,10 +3,7 @@ const router = express.Router();
 const Location = require("../../Model/Android/Location")
 const jwt = require("jsonwebtoken")
 const secret ="SECRET"
-// import zipy from 'zipyai';
-// const zipy = require("zipyai")
-
-// zipy.init('b568edaa');
+const User = require("../../Model/Android/User")
 
 
 router.use(express.json());
@@ -41,38 +38,65 @@ router.get('/getlocation', async (req, res) => {
    
 })
 
-router.post('/location', async (req, res) => { 
-    jwt.verify(req.headers.token, secret, (err, user) => {
-        if (err) console.log(err.message);
-        req.user = user.results;
-      });
-      try {
-        let results = await Location.find({ userRef: req.user }); 
-        if (results.length > 1) {
-            results = await Location.updateOne(
-              { userRef: req.user },
-              {
-                $push: {
-                    Location_info: req.body,
-                },
-              }
-            );
-          } else {
-            results = await Location.create({
-                Location_info: req.body,
-              userRef: req.user,
-            });
-          }
-          res.status(200).json({
-            status: "Success",
-            message: results,
-          });
-    } catch (e) {
-        res.status(400).json({ message: e.message });
-        console.log(e);
-    }
-  });
 
+router.get("/getlocation/:Emp_ID", async (req, res) => {
+  try {
+    const empId = req.params.Emp_ID;
+    const user = await User.findOne({ Emp_ID: empId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const location = await Location.findOne({ userRef: user._id });
+
+    if (!location) {
+      return res.status(404).json({ message: "Location record not found" });
+    }
+    res.status(200).json({
+      status: "Success",
+      message: location,
+    });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.log(e);
+  }
+});
+
+
+router.post('/location', async (req, res) => { 
+    try {
+      const decoded = jwt.verify(req.headers.token, secret);
+      console.log(decoded)
+      const empId = decoded.User; 
+  //  console.log(`empID ------ ${empId}`)
+      const user = await User.findOne({ _id: empId });
+      // console.log(`user ------ ${user}`)
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      let location = await Location.findOne({ userRef: user._id });
+  
+      if (location) {
+        location.Employee_Location.push(req.body);
+        await location.save();
+      } else {
+        location = new Location({
+          Employee_Location: [req.body],
+          userRef: user._id, 
+        });
+        await location.save();
+      }
+  
+      res.status(200).json({
+        status: "Success",
+        message: "Location added successfully",
+      });
+    } catch (e) {
+      res.status(400).json({ message: e.message });
+      console.log(e);
+    }
+});
 
 
 module.exports= router
