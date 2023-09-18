@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const User = require("../../Model/Android/User")
 const jwt = require("jsonwebtoken");
+const { default: mongoose } = require("mongoose");
 const secret = "SECRET";
 
 
@@ -19,6 +20,8 @@ router.post(
   body("confirm_password"),
   body("email").isEmail(),
   async (req, res) => {
+    // User.init()
+    console.log('hello register')
     try {
       const repeatedEmail = await User.find({ email: req.body.email });
       if (repeatedEmail.length === 0) {
@@ -38,6 +41,7 @@ router.post(
           const salt = await bcrypt.genSalt(12);
           bcrypt.hash(req.body.password, salt, async (err, hash) => {
             await User.create({
+              // _id:mongoose.Schema.Types.ObjectId,
               name:req.body.name,
               email: req.body.email,
               password: hash,
@@ -111,6 +115,7 @@ router.post(
 router.post("/emplogin", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  console.log('hello login')
 
   try {
     // Find the user by email
@@ -124,7 +129,9 @@ router.post("/emplogin", async (req, res) => {
         // Generate a JWT token
         const token = jwt.sign(
           {
+            // User: userData.Emp_ID,
             User: userData._id,
+
           },
           secret,
           { expiresIn: "1h" }

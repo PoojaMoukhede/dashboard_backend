@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken')
 const secret = "SECRET"
 const User = require("../../Model/Android/User")
 
-
 // Both checked
 router.get('/getAttandance', async (req, res) => {  
     try {
@@ -25,6 +24,7 @@ router.get('/getAttandance', async (req, res) => {
     }
    
 })
+
 
 router.post('/addAttandance', async (req, res) => { 
   try {
@@ -62,7 +62,6 @@ router.post('/addAttandance', async (req, res) => {
     console.log(e);
   }
 });
-
 
 
 router.get("/getAttandance/:Emp_ID", async (req, res) => {
