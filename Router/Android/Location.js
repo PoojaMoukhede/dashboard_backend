@@ -72,9 +72,9 @@ router.post('/location', async (req, res) => {
       const decoded = jwt.verify(req.headers.token, secret);
       console.log(decoded)
       const empId = decoded.User; 
-  //  console.log(`empID ------ ${empId}`)
+   console.log(`empID ------ ${empId}`)
       const user = await User.findOne({ _id: empId });
-      // console.log(`user ------ ${user}`)
+      console.log(`user ------ ${user}`)
   
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -82,11 +82,11 @@ router.post('/location', async (req, res) => {
       let location = await Location.findOne({ userRef: user._id });
   
       if (location) {
-        location.Employee_Location.push(req.body);
+        location.Location_info.push(req.body);
         await location.save();
       } else {
         location = new Location({
-          Employee_Location: [req.body],
+          Location_info: [req.body],
           userRef: user._id, 
         });
         await location.save();

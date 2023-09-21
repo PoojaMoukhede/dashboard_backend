@@ -114,24 +114,48 @@ router.post(
  
 router.post("/emplogin", async (req, res) => {
   const email = req.body.email;
+  const Emp_ID = req.body.Emp_ID
   const password = req.body.password;
   console.log('hello login')
 
   try {
     // Find the user by email
     const userData = await User.findOne({ email: email });
+    // Find the user by Emp_ID
+    const userDataID = await User.findOne({Emp_ID:Emp_ID})
 
-    if (userData) {
-      // Compare the provided password with the hashed password from the database
-      const passwordMatch = await bcrypt.compare(password, userData.password);
+// check with employee ID
+    if (userDataID) {
+      const passwordMatch = await bcrypt.compare(password, userDataID.password);
 
       if (passwordMatch) {
-        // Generate a JWT token
         const token = jwt.sign(
           {
-            // User: userData.Emp_ID,
+            User: userDataID._id,
+          },
+          secret,
+          { expiresIn: "1h" }
+        );
+        res.status(200).json({
+          status: "Successful",
+          token: token,
+        });
+        console.log(`crediantial : ${userDataID}`)
+      } else {
+        // Incorrect password
+        res.status(401).json({
+          status: "failed",
+          message: "Wrong password",
+        });
+      }
+    }
+    // check with employee email
+    else if(userData){
+      const passwordMatch = await bcrypt.compare(password, userData.password);
+      if (passwordMatch) {
+        const token = jwt.sign(
+          {
             User: userData._id,
-
           },
           secret,
           { expiresIn: "1h" }
@@ -150,7 +174,9 @@ router.post("/emplogin", async (req, res) => {
           message: "Wrong password",
         });
       }
-    } else {
+    }
+    
+    else {
       // User not found
       res.status(404).json({
         status: "failed",
@@ -165,6 +191,7 @@ router.post("/emplogin", async (req, res) => {
     });
   }
 });
+
 
 //getting all user
 router.get('/empdata', async (req, res) => {  

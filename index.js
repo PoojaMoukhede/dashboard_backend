@@ -13,7 +13,7 @@ const Clearance_form = require('./Router/Android/ClearanceForm')
 const Attandance = require('./Router/Android/Attandance')
 const Location = require('./Router/Android/Location')
 const Complaint = require('./Router/Android/Complaint')
-// const Attandance = require('./Router/Android/User')
+const LatLong = require('./Router/Android/LatLong')
 
 
 require('dotenv').config();
@@ -47,6 +47,8 @@ app.use('/', Clearance_form);
 app.use('/', Attandance);
 app.use('/', Location);
 app.use('/', Complaint);
+app.use('/', LatLong);
+
 
 
 app.get('/', function (req, res) {

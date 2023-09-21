@@ -27,4 +27,24 @@ router.post('/addevent', async (req, res) => {
    
 }) 
 
+router.put('/addevent/:id',async(req,res)=>{
+    try {
+        const data = req.body;
+        const Event_data = await Event.updateOne({ _id: req.params.id }, data);
+        res.json({ result: Event_data });
+    }
+    catch (e) {
+        res.status(400).json({ message: e.message });
+    }
+})
+
+
+router.delete("/delevent/:id", async (req, res) => {
+    const ID = req.params.id;
+    const Event_data = await Event.findOneAndDelete({ _id: ID });
+    res.send("Event's data has been Deleted");
+    
+})
+
+
 module.exports = router;

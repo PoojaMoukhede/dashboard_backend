@@ -14,5 +14,5 @@ const LatLongSchema = new mongooose.Schema(
   { timestamps: true }
 );
 
-const LatLong = mongooose.model("locations", LatLongSchema);
+const LatLong = mongooose.model("latLongs", LatLongSchema);
 module.exports = LatLong;
