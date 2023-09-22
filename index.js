@@ -59,4 +59,4 @@ app.get('/', function (req, res) {
 
 app.listen(port,()=>{console.log(`server is up on port ${port}`)});
 
-
+app.keepAliveTimeout = 60000; 

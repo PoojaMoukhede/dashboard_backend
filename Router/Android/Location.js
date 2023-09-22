@@ -69,8 +69,10 @@ router.get("/getlocation/:Emp_ID", async (req, res) => {
 router.post('/location', async (req, res) => { 
   console.log("hello Location post call")
     try {
-      console.log('Header: '+ req.headers.names)
+      console.log(`----------${JSON.stringify(req.headers)}`)
+      console.log('Header: '+ req.headers)
       console.log('Header Token: '+ req.headers.token)
+      console.log(secret)
       const decoded = jwt.verify(req.headers.token, secret);
       console.log(decoded)
       const empId = decoded.User; 
