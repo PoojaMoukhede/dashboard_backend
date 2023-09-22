@@ -141,7 +141,7 @@ router.post("/emplogin", async (req, res) => {
         res.status(200).json({
           status: "Successful",
           // token: token,
-          userData:userData._id
+          userId:userData._id
         });
         // console.log(token)
         console.log(`crediantial : ${userDataID}`)
@@ -170,7 +170,7 @@ router.post("/emplogin", async (req, res) => {
         res.status(200).json({
           status: "Successful",
           // token: token,
-          userData:userData._id
+          userId:userData._id
         });
         // console.log(token)
         console.log(`crediantial : ${userData}`)
