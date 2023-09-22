@@ -6,7 +6,7 @@ const LatLongSchema = new mongooose.Schema(
       {
         latitude: { type: String },
         longitude: { type: String },
-        distance: { type: String },
+        // distance: { type: String },
       },
     ],
     userRef: { type: mongooose.Schema.Types.ObjectId, ref: "users" },

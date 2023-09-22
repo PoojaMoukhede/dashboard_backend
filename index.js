@@ -6,7 +6,7 @@ const route = require('./Router/Web/Admin');
 const e_route = require('./Router/Web/AddEmployee');
 const m_route = require('./Router/Web/Manager');
 const event_route = require("./Router/Web/Event")
-
+const sendEmail = require('./utils/sendMail')
 //Android routing
 const Android_user = require('./Router/Android/User')
 const Clearance_form = require('./Router/Android/ClearanceForm')
@@ -56,6 +56,47 @@ app.get('/', function (req, res) {
   console.log("Browser request")
   
 })
+
+// app.post('/api/test-email', async(req, res)=>{
+//   console.log("Email api call")
+//   try {
+//     console.log("Email api call 1 ")
+//       await sendEmail({
+//           to: 'pooja3000000000@gmail.com',
+//           from: 'poojamoukhede27@gmail.com',
+//           subject: 'Does this work?',
+//           text: 'Glad you are here .. yes you!',
+//           html:'<strong>It is working!!</strong>'
+//       });
+//       res.sendStatus(200);
+//       console.log("Email api call 2 ")
+//   } catch (e) {
+//       console.log(e);
+//       res.sendStatus(500);
+//   }
+// });
+
+
+app.post('/api/test-email', async (req, res) => {
+  console.log("Email api call");
+  try {
+    console.log("Email api call 1");
+    await sendEmail({
+      to: 'pooja3000000000@gmail.com',
+      from: 'poojamoukhede27@gmail.com',
+      subject: 'Does this work?',
+      text: 'Glad you are here .. yes you!',
+      html: '<strong>It is working!!</strong>'
+    });
+    console.log("Email sent successfully");
+    res.sendStatus(200);
+  } catch (e) {
+    console.error("Email send error:", e.response ? e.response.body : e.message);
+    res.sendStatus(500);
+  }
+});
+
+
 
 app.listen(port,()=>{console.log(`server is up on port ${port}`)});
 

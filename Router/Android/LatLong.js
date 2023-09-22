@@ -93,5 +93,35 @@ router.get("/latLong/:Emp_ID", async (req, res) => {
   }
 });
 
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const earthRadius = 6371; // Radius of the Earth in kilometers
 
+  // Convert latitude and longitude from degrees to radians
+  const radLat1 = (Math.PI / 180) * lat1;
+  const radLon1 = (Math.PI / 180) * lon1;
+  const radLat2 = (Math.PI / 180) * lat2;
+  const radLon2 = (Math.PI / 180) * lon2;
+
+  // Haversine formula
+  const dLat = radLat2 - radLat1;
+  const dLon = radLon2 - radLon1;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(radLat1) * Math.cos(radLat2) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = earthRadius * c; // Distance in kilometers like (0.25 km)
+
+  return distance;
+}
+router.get('/calculate-distance', (req, res) => {   ///calculate-distance?lat1=52.5200&lon1=13.4050&lat2=48.8566&lon2=2.3522
+  const { lat1, lon1, lat2, lon2 } = req.query;
+
+  if (!lat1 || !lon1 || !lat2 || !lon2) {
+    return res.status(400).json({ message: 'Invalid input. Please provide lat1, lon1, lat2, and lon2 as query parameters.' });
+  }
+
+  const distance = calculateDistance(parseFloat(lat1), parseFloat(lon1), parseFloat(lat2), parseFloat(lon2));
+
+  res.json({ distance: distance.toFixed(2) });
+})
 module.exports= router
