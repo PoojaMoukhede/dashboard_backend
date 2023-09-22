@@ -9,42 +9,58 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
 // Both Checked
-router.get('/getcomplaint', async (req, res) => {  
+router.get('/complaint', async (req, res) => {  
   console.log("hello Complaint post call")
 
-    if (req.headers.token !== null) {
-        jwt.verify(req.headers.token, secret, (err, user) => {
-          if (err) console.log(err.message);
-          else req.user = user.data;
-        });
-        try {
-          const data = await Complaint.find({ userRef: req.user });
-          res.status(200).json({
-            status: "Sucess",
-            message: data,
-          });
-        } catch (error) {
-          res.status(500).json({
-            status: "Failed",
-            message: error.message,
-          });
-        }
-      } else {
-        res.status(500).json({
-          status: "Failed",
-          message: "Please Refresh the Page",
-        });
+    // if (req.headers.token !== null) {
+    //     jwt.verify(req.headers.token, secret, (err, user) => {
+    //       if (err) console.log(err.message);
+    //       else req.user = user.data;
+    //     });
+    //     try {
+    //       const data = await Complaint.find({ userRef: req.user });
+    //       res.status(200).json({
+    //         status: "Sucess",
+    //         message: data,
+    //       });
+    //     } catch (error) {
+    //       res.status(500).json({
+    //         status: "Failed",
+    //         message: error.message,
+    //       });
+    //     }
+    //   } else {
+    //     res.status(500).json({
+    //       status: "Failed",
+    //       message: "Please Refresh the Page",
+    //     });
+    //   }
+
+    try {
+      const formRecord = await Complaint.find();
+  
+      if (!formRecord) {
+        return res.status(404).json({ message: "No Record records found" });
       }
+  
+      res.status(200).json({
+        status: "Success",
+        message: formRecord,
+      });
+    } catch (e) {
+      res.status(500).json({ message: e.message });
+      console.log(e);
+    }
    
 }) 
 
 
-router.get("/getcomplaint/:Emp_ID", async (req, res) => {
+router.get("/complaint/:Emp_ID", async (req, res) => {
   console.log("hello Complaint get Emp_ID call")
 
   try {
-    const empId = req.params.Emp_ID;
-    const user = await User.findOne({ Emp_ID: empId });
+    const userId = req.params.Emp_ID;
+    const user = await User.findOne({ Emp_ID: userId });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -67,9 +83,9 @@ router.get("/getcomplaint/:Emp_ID", async (req, res) => {
 // router.post('/complaint', async (req, res) => { 
 //   try {
 //     const decoded = jwt.verify(req.headers.token, secret);
-//     const empId = decoded.Emp_ID; 
+//     const userId = decoded.Emp_ID; 
 
-//     const user = await User.findOne({ Emp_ID: empId });
+//     const user = await User.findOne({ Emp_ID: userId });
 //         console.log(`user : ${user}`)
 //     if (!user) {
 //       return res.status(404).json({ message: "User not found" });
@@ -103,12 +119,13 @@ router.post('/complaint', async (req, res) => {
   console.log("hello Complaint post call")
 
   try {
-    const decoded = jwt.verify(req.headers.token, secret);
-    console.log(decoded)
-    const empId = decoded.User; 
- console.log(`empID ------ ${empId}`)
+//     const decoded = jwt.verify(req.headers.token, secret);
+//     console.log(decoded)
+//     const userId = decoded.User; 
+//  console.log(`userId ------ ${userId}`)
+const userId = req.body.userId;
   
-    const user = await User.findOne({ _id: empId });
+    const user = await User.findOne({ _id: userId });
     console.log(`user ------ ${user}`)
 
     if (!user) {

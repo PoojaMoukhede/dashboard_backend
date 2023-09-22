@@ -57,48 +57,16 @@ router.get("/form", async (req, res) => {
 });
 
 // POST a new clearance
-router.post("/apply", upload.single("image"), async (req, res) => {
-  // try {
-  //   const decoded = jwt.verify(req.headers.token, secret);
-  //   const empId = decoded.Emp_ID; // Assuming your JWT payload contains Emp_ID
-
-  //   // Find the user by Emp_ID to ensure it exists
-  //   const results = await User.findOne({ Emp_ID: empId });
-
-  //   if (!results) {
-  //     return res.status(404).json({ message: "User not found" });
-  //   }
-  //   let Record = await Clearance.findOne({ userRef: results._id });
-
-  //   if (Record) {
-  //     // If Record record exists, update it
-  //     Record.FormData.push(req.body);
-  //     await Record.save();
-  //   } else {
-  //     Record = new Clearance({
-  //       FormData: [req.body],
-  //       userRef: results._id, // Ensure that user._id is correctly assigned
-  //     });
-  //     await Record.save();
-  //   }
-
-  //   res.status(200).json({
-  //     status: "Success",
-  //     message: "Record added successfully",
-  //   });
-  // } catch (e) {
-  //   res.status(400).json({ message: e.message });
-  //   console.log(e);
-  // }
+router.post("/form", upload.single("image"), async (req, res) => {
   console.log("hello attandance post call")
-
   try {
-    const decoded = jwt.verify(req.headers.token, secret);
-    console.log(decoded)
-    const empId = decoded.User; // Assuming JWT  contains Emp_ID
- console.log(`empID ------ ${empId}`)
+//     const decoded = jwt.verify(req.headers.token, secret);
+//     console.log(decoded)
+//     const userId = decoded.User; // Assuming JWT  contains Emp_ID
+//  console.log(`userId ------ ${userId}`)
     // Find the user by Emp_ID to ensure it exists
-    const user = await User.findOne({ _id: empId });
+    const userId = req.body.userId;
+    const user = await User.findOne({ _id: userId });
     console.log(`user ------ ${user}`)
 
     if (!user) {
@@ -133,8 +101,8 @@ router.get("/form/:Emp_ID", async (req, res) => {
   console.log("hello attandance get ID call")
 
   try {
-    const empId = req.params.Emp_ID;
-    const user = await User.findOne({ Emp_ID: empId });
+    const userId = req.params.Emp_ID;
+    const user = await User.findOne({ Emp_ID: userId });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

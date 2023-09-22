@@ -6,7 +6,7 @@ const secret = "SECRET"
 const User = require("../../Model/Android/User")
 
 // Both checked
-router.get('/getLatLong', async (req, res) => {  
+router.get('/latLong', async (req, res) => {  
   console.log("hello LatLong")
     try {
       const attendanceRecords = await LatLong.find();
@@ -27,16 +27,17 @@ router.get('/getLatLong', async (req, res) => {
 })
 
 
-router.post('/addLatLong', async (req, res) => { 
+router.post('/latLong', async (req, res) => { 
   console.log("hello LatLong post call")
 
   try {
-    const decoded = jwt.verify(req.headers.token, secret);
-    console.log(decoded)
-    const empId = decoded.User; // Assuming JWT  contains Emp_ID
- console.log(`empID ------ ${empId}`)
+//     const decoded = jwt.verify(req.headers.token, secret);
+//     console.log(decoded)
+//     const userId = decoded.User; // Assuming JWT  contains Emp_ID
+//  console.log(`userId ------ ${userId}`)
     // Find the user by Emp_ID to ensure it exists
-    const user = await User.findOne({ _id: empId });
+    const userId = req.body.userId;
+    const user = await User.findOne({ _id: userId });
     console.log(`user ------ ${user}`)
 
     if (!user) {
@@ -67,12 +68,12 @@ router.post('/addLatLong', async (req, res) => {
 });
 
 
-router.get("/getLatLong/:Emp_ID", async (req, res) => {
+router.get("/latLong/:Emp_ID", async (req, res) => {
   console.log("hello LatLong get ID call")
 
   try {
-    const empId = req.params.Emp_ID;
-    const user = await User.findOne({ Emp_ID: empId });
+    const userId = req.params.Emp_ID;
+    const user = await User.findOne({ Emp_ID: userId });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
