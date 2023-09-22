@@ -129,20 +129,21 @@ router.post("/emplogin", async (req, res) => {
       const passwordMatch = await bcrypt.compare(password, userDataID.password);
 
       if (passwordMatch) {
-        const token = jwt.sign(
-          {
-            User: userDataID._id,
-          },
-          secret,
-          // { expiresIn: "1h" }
-          { expiresIn: "24h" }
+        // const token = jwt.sign(
+        //   {
+        //     User: userDataID._id,
+        //   },
+        //   secret,
+        //   // { expiresIn: "1h" }
+        //   { expiresIn: "24h" }
 
-        );
+        // );
         res.status(200).json({
           status: "Successful",
-          token: token,
+          // token: token,
+          userData:userData._id
         });
-        console.log(token)
+        // console.log(token)
         console.log(`crediantial : ${userDataID}`)
       } else {
         // Incorrect password
@@ -156,21 +157,22 @@ router.post("/emplogin", async (req, res) => {
     else if(userData){
       const passwordMatch = await bcrypt.compare(password, userData.password);
       if (passwordMatch) {
-        const token = jwt.sign(
-          {
-            User: userData._id,
-          },
-          secret,
-          // { expiresIn: "1h" }
-          { expiresIn: "24h" }
-        );
+        // const token = jwt.sign(
+        //   {
+        //     User: userData._id,
+        //   },
+        //   secret,
+        //   // { expiresIn: "1h" }
+        //   { expiresIn: "24h" }
+        // );
 
         // Respond with a success message and the token
         res.status(200).json({
           status: "Successful",
-          token: token,
+          // token: token,
+          userData:userData._id
         });
-        console.log(token)
+        // console.log(token)
         console.log(`crediantial : ${userData}`)
       } else {
         // Incorrect password
