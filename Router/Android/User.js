@@ -140,6 +140,7 @@ router.post("/emplogin", async (req, res) => {
           status: "Successful",
           token: token,
         });
+        console.log(token)
         console.log(`crediantial : ${userDataID}`)
       } else {
         // Incorrect password
@@ -166,6 +167,7 @@ router.post("/emplogin", async (req, res) => {
           status: "Successful",
           token: token,
         });
+        console.log(token)
         console.log(`crediantial : ${userData}`)
       } else {
         // Incorrect password
