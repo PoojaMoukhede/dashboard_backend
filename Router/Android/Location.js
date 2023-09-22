@@ -77,9 +77,9 @@ router.post('/location', async (req, res) => {
       // console.log(decoded)
       // const empId = decoded.User; 
      
-    const empId = req.body.empId;
-   console.log(`empID ------ ${empId}`)
-      const user = await User.findOne({ _id: empId });
+    const userId = req.body.userId;
+   console.log(`userId ------ ${userId}`)
+      const user = await User.findOne({ _id: userId });
       console.log(`user ------ ${user}`)
   
       if (!user) {
