@@ -69,15 +69,15 @@ router.get("/getlocation/:Emp_ID", async (req, res) => {
 router.post('/location', async (req, res) => { 
   console.log("hello Location post call")
     try {
-      // console.log(`----------${JSON.stringify(req.headers)}`)
-      // console.log('Header: '+ req.headers)
-      // console.log('Header Token: '+ req.headers.token)
-      // console.log(secret)
-      // const decoded = jwt.verify(req.headers.token, secret);
-      // console.log(decoded)
-      // const empId = decoded.User; 
+      console.log(`----------${JSON.stringify(req.headers)}`)
+      console.log('Header: '+ req.headers)
+      console.log('Header Token: '+ req.headers.token)
+      console.log(secret)
+      const decoded = jwt.verify(req.headers.token, secret);
+      console.log(decoded)
+      const userId = decoded.User; 
      
-    const userId = req.body.userId;
+    // const userId = req.body.userId;
    console.log(`userId ------ ${userId}`)
       const user = await User.findOne({ _id: userId });
       console.log(`user ------ ${user}`)
