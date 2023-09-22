@@ -134,7 +134,9 @@ router.post("/emplogin", async (req, res) => {
             User: userDataID._id,
           },
           secret,
-          { expiresIn: "1h" }
+          // { expiresIn: "1h" }
+          { expiresIn: "24h" }
+
         );
         res.status(200).json({
           status: "Successful",
@@ -159,7 +161,8 @@ router.post("/emplogin", async (req, res) => {
             User: userData._id,
           },
           secret,
-          { expiresIn: "1h" }
+          // { expiresIn: "1h" }
+          { expiresIn: "24h" }
         );
 
         // Respond with a success message and the token
