@@ -77,6 +77,7 @@ app.get('/', function (req, res) {
 // });
 
 
+// for web only
 app.post('/api/test-email', async (req, res) => {
   console.log("Email api call");
   try {
