@@ -7,7 +7,7 @@ const upload = multer({ dest: 'uploads/' })
 
 
 // To get/view all employees
-router.get('/get', async (req, res) => {  
+router.get('/employees', async (req, res) => {  
     try {
         const results = await Employee.find();
         res.json(results);
@@ -19,7 +19,7 @@ router.get('/get', async (req, res) => {
    
 })
 
-router.get('/getemployee/:id', async (req, res) => {  
+router.get('/employees/:id', async (req, res) => {  
   const employeeId = req.params.id;
   try {
       const employee = await Employee.findById(employeeId);
@@ -36,7 +36,7 @@ router.get('/getemployee/:id', async (req, res) => {
 });
 
 // To add new employee
-router.post('/add', async (req, res) => { 
+router.post('/employees', async (req, res) => { 
     try {
         let Employee_data = await Employee.create({
             ...req.body
@@ -49,7 +49,7 @@ router.post('/add', async (req, res) => {
    
 }) 
 
-router.put('/putEmployee/:id', async (req, res) => {
+router.put('/employees/:id', async (req, res) => {
 
   try {
       const data = req.body;
@@ -64,7 +64,7 @@ router.put('/putEmployee/:id', async (req, res) => {
 });
 
 //delete
-router.delete("/deleteEmployee/:id", async (req, res) => {
+router.delete("/employees/:id", async (req, res) => {
   const ID = req.params.id;
   const employee = await Employee.findOneAndDelete({ _id: ID });
   res.send("Employee's data has been Deleted");

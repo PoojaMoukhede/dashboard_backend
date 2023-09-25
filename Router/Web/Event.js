@@ -3,7 +3,7 @@ const router = express.Router();
 const Event = require('../../Model/Web/Event')
 
 
-router.get('/getevent', async (req, res) => {  
+router.get('/event', async (req, res) => {  
     try {
         const Event_data = await Event.find();
         res.json(Event_data);
@@ -15,7 +15,7 @@ router.get('/getevent', async (req, res) => {
 })
 
 
-router.post('/addevent', async (req, res) => { 
+router.post('/event', async (req, res) => { 
     try {
         let Event_data = await Event.create({
             ...req.body
@@ -27,7 +27,7 @@ router.post('/addevent', async (req, res) => {
    
 }) 
 
-router.put('/addevent/:id',async(req,res)=>{
+router.put('/event/:id',async(req,res)=>{
     try {
         const data = req.body;
         const Event_data = await Event.updateOne({ _id: req.params.id }, data);
@@ -39,7 +39,7 @@ router.put('/addevent/:id',async(req,res)=>{
 })
 
 
-router.delete("/delevent/:id", async (req, res) => {
+router.delete("/event/:id", async (req, res) => {
     const ID = req.params.id;
     const Event_data = await Event.findOneAndDelete({ _id: ID });
     res.send("Event's data has been Deleted");

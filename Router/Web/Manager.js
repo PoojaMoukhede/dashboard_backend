@@ -7,7 +7,7 @@ const xlsx = require('xlsx');
 const upload = multer({ dest: 'uploads/' })
 
 // To get/view all Managers
-router.get('/getmanager', async (req, res) => {  
+router.get('/manager', async (req, res) => {  
     try {
         const results = await Manager.find();
         res.json(results);
@@ -19,7 +19,7 @@ router.get('/getmanager', async (req, res) => {
    
 })
 
-router.get('/getmanager/:id', async (req, res) => {  
+router.get('/manager/:id', async (req, res) => {  
     const managerId = req.params.id;
     try {
         const manager = await Manager.findById(managerId);
@@ -37,7 +37,7 @@ router.get('/getmanager/:id', async (req, res) => {
 
 
 // To add new Manager
-router.post('/addmanager', async (req, res) => { 
+router.post('/manager', async (req, res) => { 
     try {
         let Manager_data = await Manager.create({
             ...req.body
@@ -52,7 +52,7 @@ router.post('/addmanager', async (req, res) => {
 })
 
 //edit
-router.put('/put/:id', async (req, res) => {
+router.put('/manager/:id', async (req, res) => {
 
     try {
         const data = req.body;
@@ -66,14 +66,14 @@ router.put('/put/:id', async (req, res) => {
 });
 
 //delete
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/manager/:id", async (req, res) => {
     const ID = req.params.id;
     const Manager_data = await Manager.findOneAndDelete({ _id: ID });
     res.send("Manager's data has been Deleted");
     
 })
 
-router.delete("/deleteAll", async (req, res) => {
+router.delete("/manager", async (req, res) => {
     const selectedUser= req.body._id;
     const Manager_data = await Manager.deleteMany({ _id: selectedUser });
     res.send("Manager's data has been Deleted");
