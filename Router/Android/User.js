@@ -131,6 +131,7 @@ router.post("/emplogin", async (req, res) => {
           status: "Successful",
           // token: token,
           userId:userData._id
+          
         });
         // console.log(token)
         console.log(`crediantial : ${userData}`)
