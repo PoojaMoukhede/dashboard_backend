@@ -6,6 +6,8 @@ const User = require("../../Model/Android/User")
 const jwt = require("jsonwebtoken");
 const { default: mongoose } = require("mongoose");
 const secret = "SECRET";
+const Fuel = require("../../Model/Web/Fuel")
+const Expanse = require('../../Model/Web/Expanse')
 
 
 router.use(express.json());
@@ -115,20 +117,20 @@ router.post("/emplogin", async (req, res) => {
     else if(userData){
       const passwordMatch = await bcrypt.compare(password, userData.password);
       if (passwordMatch) {
-        // const token = jwt.sign(
-        //   {
-        //     User: userData._id,
-        //   },
-        //   secret,
-        //   // { expiresIn: "1h" }
-        //   { expiresIn: "24h" }
-        // );
+        const token = jwt.sign(
+          {
+            User: userData._id,
+          },
+          secret,
+          // { expiresIn: "1h" }
+          { expiresIn: "24h" }
+        );
 
         // Respond with a success message and the token
         res.status(200).json({
           status: "Successful",
-          // token: token,
-          userId:userData._id
+          token: token,
+          // userId:userData._id
         });
         // console.log(token)
         console.log(`crediantial : ${userData}`)
@@ -171,5 +173,99 @@ router.get('/empdata', async (req, res) => {
     }
    
   })
+
+  router.get("/fuel", async (req, res) => {
+    try {
+      const results = await Fuel.find();
+      res.json(results);
+      console.log("Result in GET:", results);
+    } catch (e) {
+      res.status(400).json({ message: e.message });
+      console.log(e);
+    }
+  });
+  
+// fuel
+router.post("/fuel", async (req, res) => {
+  try {
+    const { month, Liters } = req.body;
+    const newFuelConsumption = new Fuel({
+      month,
+      Liters,
+    });
+    const insertedData = await newFuelConsumption.save();
+    res.json(insertedData);
+    console.log("Inserted data:", insertedData);
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.error(e);
+  }
+})
+
+
+router.get("/fuel", async (req, res) => {
+  try {
+    const results = await Fuel.find();
+    res.json(results);
+    console.log("Result in GET:", results);
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.error(e);
+  }
+});
+
+
+  // router.post("/fuel", async (req, res) => {
+  //   try {
+
+  //     const fuelData = req.body.FuelConsumption;
+  //     // const insertedData = await Fuel.create({ FuelConsumption: fuelData });
+  //     const insertedData = await Fuel.create(req.body);
+
+  
+  //     res.json(insertedData);
+  //     console.log("Inserted data:", insertedData);
+  //   } catch (e) {
+  //     res.status(400).json({ message: e.message });
+  //     console.log(e);
+  //   }
+  // });
+  // router.get("/fuel", async (req, res) => {
+  //   try {
+  //     const results = await Fuel.find();
+  //     res.json(results);
+  //     console.log("Result in GET:", results);
+  //   } catch (e) {
+  //     res.status(400).json({ message: e.message });
+  //     console.log(e);
+  //   }
+  // });
+  
+// expanse
+  router.post("/expanse", async (req, res) => {
+    try {
+
+      // const fuelData = req.body.FuelConsumption;
+      // const insertedData = await Fuel.create({ FuelConsumption: fuelData });
+      const insertedData = await Expanse.create(req.body);
+
+  
+      res.json(insertedData);
+      console.log("Inserted data:", insertedData);
+    } catch (e) {
+      res.status(400).json({ message: e.message });
+      console.log(e);
+    }
+  });
+  router.get("/expanse", async (req, res) => {
+    try {
+      const results = await Expanse.find();
+      res.json(results);
+      console.log("Result in GET:", results);
+    } catch (e) {
+      res.status(400).json({ message: e.message });
+      console.log(e);
+    }
+  });
 
 module.exports = router;

@@ -119,22 +119,22 @@ router.post('/complaint', async (req, res) => {
   console.log("hello Complaint post call")
 
   try {
-//     const decoded = jwt.verify(req.headers.token, secret);
-//     console.log(decoded)
-//     const userId = decoded.User; 
-//  console.log(`userId ------ ${userId}`)
-const userId = req.body.userId;
-  
+    const decoded = jwt.verify(req.headers.token, secret);
+    console.log(decoded)
+    const userId = decoded.User; 
+ console.log(`userId ------ ${userId}`)
+// const userId = req.body.userId;
     const user = await User.findOne({ _id: userId });
     console.log(`user ------ ${user}`)
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    let complaint = await Complaint.findOne({ userRef: user._id });
+    let complaint = await Complaint.findOne({ userRef: user._id }).populate('userRef', 'name');
 
     if (complaint) {
       complaint.Message.push(req.body);
+      
       await complaint.save();
     } else {
       complaint = new Complaint({

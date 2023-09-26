@@ -7,7 +7,8 @@ const managerSchema = new mongooose.Schema({
     contact_no: { type: String },
     city:{type: String },
     state:{type: String },
-    blood_group:{type: String }
+    blood_group:{type: String },
+    department:{type:String},
 })
 
 const Manager = mongooose.model('managers', managerSchema);
