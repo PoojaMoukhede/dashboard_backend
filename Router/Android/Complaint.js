@@ -119,11 +119,11 @@ router.post('/complaint', async (req, res) => {
   console.log("hello Complaint post call")
 
   try {
-    const decoded = jwt.verify(req.headers.token, secret);
-    console.log(decoded)
-    const userId = decoded.User; 
- console.log(`userId ------ ${userId}`)
-// const userId = req.body.userId;
+//     const decoded = jwt.verify(req.headers.token, secret);
+//     console.log(decoded)
+//     const userId = decoded.User; 
+//  console.log(`userId ------ ${userId}`)
+const userId = req.body.userId;
     const user = await User.findOne({ _id: userId });
     console.log(`user ------ ${user}`)
 
