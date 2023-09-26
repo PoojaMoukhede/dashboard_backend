@@ -44,7 +44,7 @@ router.post(
           bcrypt.hash(req.body.password, salt, async (err, hash) => {
             await User.create({
               // _id:mongoose.Schema.Types.ObjectId,
-              // name:req.body.name,
+              name:req.body.name,
               email: req.body.email,
               password: hash,
               Emp_ID:req.body.Emp_ID
@@ -131,7 +131,7 @@ router.post("/emplogin", async (req, res) => {
           status: "Successful",
           // token: token,
           userId:userData._id
-          
+
         });
         // console.log(token)
         console.log(`crediantial : ${userData}`)
