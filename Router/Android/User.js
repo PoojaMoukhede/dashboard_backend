@@ -16,61 +16,61 @@ router.use(express.urlencoded({ extended: true }));
 
 // Both Checked
 // register
-// router.post(
-//   "/empregister",
-//   body("password"),
-//   body("confirm_password"),
-//   body("email").isEmail(),
-//   async (req, res) => {
-//     // User.init()
-//     console.log('hello register')
-//     try {
-//       const repeatedEmail = await User.find({ email: req.body.email });
-//       if (repeatedEmail.length === 0) {
+router.post(
+  "/empregister",
+  body("password"),
+  body("confirm_password"),
+  body("email").isEmail(),
+  async (req, res) => {
+    // User.init()
+    console.log('hello register')
+    try {
+      const repeatedEmail = await User.find({ email: req.body.email });
+      if (repeatedEmail.length === 0) {
        
-//         const errors = validationResult(req);
-//         // console.log("Data from anddroid",res)
-//         if (!errors.isEmpty()) {
-//           res.status(400).json({
-//             status: "Failed By Validator",
-//             message: errors.array(),
-//           });
-//         } else {
-//           const { password, confirm_password } = req.body; 
-//           if (password != confirm_password)
-//             return res.status(400).json({ message: "password doesnot match" });
+        const errors = validationResult(req);
+        // console.log("Data from anddroid",res)
+        if (!errors.isEmpty()) {
+          res.status(400).json({
+            status: "Failed By Validator",
+            message: errors.array(),
+          });
+        } else {
+          const { password, confirm_password } = req.body; 
+          if (password != confirm_password)
+            return res.status(400).json({ message: "password doesnot match" });
 
-//           const salt = await bcrypt.genSalt(12);
-//           bcrypt.hash(req.body.password, salt, async (err, hash) => {
-//             await User.create({
-//               // _id:mongoose.Schema.Types.ObjectId,
-//               name:req.body.name,
-//               email: req.body.email,
-//               password: hash,
-//               Emp_ID:req.body.Emp_ID
-//             });
-//           });
-//           res.status(200).json({
-//             status: "Success",
-//             message: "Please Login",
-//           });
-//         }
-//       } else {
-//         res.status(400).json({
-//           status: "Failed",
-//           error: "User Already Exists",
-//         });
-//       } 
-//        console.log("data from android",req.body)
-//     } catch (error) {
-//       res.status(500).json({
-//         status: "Failed",
-//         message: err.message,
-//       });
-//     }
-//   }
+          const salt = await bcrypt.genSalt(12);
+          bcrypt.hash(req.body.password, salt, async (err, hash) => {
+            await User.create({
+              // _id:mongoose.Schema.Types.ObjectId,
+              // name:req.body.name,
+              email: req.body.email,
+              password: hash,
+              Emp_ID:req.body.Emp_ID
+            });
+          });
+          res.status(200).json({
+            status: "Success",
+            message: "Please Login",
+          });
+        }
+      } else {
+        res.status(400).json({
+          status: "Failed",
+          error: "User Already Exists",
+        });
+      } 
+       console.log("data from android",req.body)
+    } catch (error) {
+      res.status(500).json({
+        status: "Failed",
+        message: err.message,
+      });
+    }
+  }
  
-// );
+);
 
 router.post("/emplogin", async (req, res) => {
   const email = req.body.email;
@@ -103,7 +103,7 @@ router.post("/emplogin", async (req, res) => {
           // token: token,
           userId:userData._id
         });
-        console.log(token)
+        // console.log(token)
         console.log(`crediantial : ${userDataID}`)
       } else {
         // Incorrect password
@@ -117,20 +117,20 @@ router.post("/emplogin", async (req, res) => {
     else if(userData){
       const passwordMatch = await bcrypt.compare(password, userData.password);
       if (passwordMatch) {
-        const token = jwt.sign(
-          {
-            User: userData._id,
-          },
-          secret,
-          // { expiresIn: "1h" }
-          { expiresIn: "24h" }
-        );
+        // const token = jwt.sign(
+        //   {
+        //     User: userData._id,
+        //   },
+        //   secret,
+        //   // { expiresIn: "1h" }
+        //   { expiresIn: "24h" }
+        // );
 
         // Respond with a success message and the token
         res.status(200).json({
           status: "Successful",
-          token: token,
-          // userId:userData._id
+          // token: token,
+          userId:userData._id
         });
         // console.log(token)
         console.log(`crediantial : ${userData}`)
