@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const User = require("../../Model/Android/User")
 const jwt = require("jsonwebtoken");
-const { default: mongoose } = require("mongoose");
+// const { default: mongoose } = require("mongoose");
 const secret = "SECRET";
 const Fuel = require("../../Model/Web/Fuel")
 const Expanse = require('../../Model/Web/Expanse')
@@ -16,61 +16,61 @@ router.use(express.urlencoded({ extended: true }));
 
 // Both Checked
 // register
-router.post(
-  "/empregister",
-  body("password"),
-  body("confirm_password"),
-  body("email").isEmail(),
-  async (req, res) => {
-    // User.init()
-    console.log('hello register')
-    try {
-      const repeatedEmail = await User.find({ email: req.body.email });
-      if (repeatedEmail.length === 0) {
+// router.post(
+//   "/empregister",
+//   body("password"),
+//   body("confirm_password"),
+//   body("email").isEmail(),
+//   async (req, res) => {
+//     // User.init()
+//     console.log('hello register')
+//     try {
+//       const repeatedEmail = await User.find({ email: req.body.email });
+//       if (repeatedEmail.length === 0) {
        
-        const errors = validationResult(req);
-        // console.log("Data from anddroid",res)
-        if (!errors.isEmpty()) {
-          res.status(400).json({
-            status: "Failed By Validator",
-            message: errors.array(),
-          });
-        } else {
-          const { password, confirm_password } = req.body; 
-          if (password != confirm_password)
-            return res.status(400).json({ message: "password doesnot match" });
+//         const errors = validationResult(req);
+//         // console.log("Data from anddroid",res)
+//         if (!errors.isEmpty()) {
+//           res.status(400).json({
+//             status: "Failed By Validator",
+//             message: errors.array(),
+//           });
+//         } else {
+//           const { password, confirm_password } = req.body; 
+//           if (password != confirm_password)
+//             return res.status(400).json({ message: "password doesnot match" });
 
-          const salt = await bcrypt.genSalt(12);
-          bcrypt.hash(req.body.password, salt, async (err, hash) => {
-            await User.create({
-              // _id:mongoose.Schema.Types.ObjectId,
-              name:req.body.name,
-              email: req.body.email,
-              password: hash,
-              Emp_ID:req.body.Emp_ID
-            });
-          });
-          res.status(200).json({
-            status: "Success",
-            message: "Please Login",
-          });
-        }
-      } else {
-        res.status(400).json({
-          status: "Failed",
-          error: "User Already Exists",
-        });
-      } 
-       console.log("data from android",req.body)
-    } catch (error) {
-      res.status(500).json({
-        status: "Failed",
-        message: err.message,
-      });
-    }
-  }
+//           const salt = await bcrypt.genSalt(12);
+//           bcrypt.hash(req.body.password, salt, async (err, hash) => {
+//             await User.create({
+//               // _id:mongoose.Schema.Types.ObjectId,
+//               name:req.body.name,
+//               email: req.body.email,
+//               password: hash,
+//               Emp_ID:req.body.Emp_ID
+//             });
+//           });
+//           res.status(200).json({
+//             status: "Success",
+//             message: "Please Login",
+//           });
+//         }
+//       } else {
+//         res.status(400).json({
+//           status: "Failed",
+//           error: "User Already Exists",
+//         });
+//       } 
+//        console.log("data from android",req.body)
+//     } catch (error) {
+//       res.status(500).json({
+//         status: "Failed",
+//         message: err.message,
+//       });
+//     }
+//   }
  
-);
+// );
 
 router.post("/emplogin", async (req, res) => {
   const email = req.body.email;
@@ -207,7 +207,7 @@ router.get("/fuel", async (req, res) => {
   try {
     const results = await Fuel.find();
     res.json(results);
-    console.log("Result in GET:", results);
+    // console.log("Result in GET:", results);
   } catch (e) {
     res.status(400).json({ message: e.message });
     console.error(e);
@@ -261,7 +261,7 @@ router.get("/fuel", async (req, res) => {
     try {
       const results = await Expanse.find();
       res.json(results);
-      console.log("Result in GET:", results);
+      // console.log("Result in GET:", results);
     } catch (e) {
       res.status(400).json({ message: e.message });
       console.log(e);

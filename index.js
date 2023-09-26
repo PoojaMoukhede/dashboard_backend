@@ -15,13 +15,11 @@ const Location = require('./Router/Android/Location')
 const Complaint = require('./Router/Android/Complaint')
 const LatLong = require('./Router/Android/LatLong')
 
-
+const cors = require('cors');
+app.use(cors())
 require('dotenv').config();
 const port =process.env.PORT || 8080;
-const cors = require('cors');
 
-
-app.use(cors())
 
 
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -101,4 +99,4 @@ app.post('/api/test-email', async (req, res) => {
 
 app.listen(port,()=>{console.log(`server is up on port ${port}`)});
 
-app.keepAliveTimeout = 60000; 
+// app.keepAliveTimeout = 60000; 
