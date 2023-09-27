@@ -1,8 +1,9 @@
 const mongooose = require("mongoose");
 
 const expanseSchema = new mongooose.Schema({
-    month:{type:String},
-    money: { type: Number},
+    month: { type: String },
+    money: { type: Number },
+    date: { type: Date, default: Date.now },
 
 });
 

@@ -2,17 +2,14 @@
 const mongooose = require("mongoose");
 
 const fuelSchema = new mongooose.Schema({
-    // month:{type:String},
+    month:{type:String},
     // Liters: { type: Number},
-    month: {
-    type: Date,
-    // required: true,
-  },
+   
   Liters: {
     type: Number,
     // required: true,
   },
-   
+  date: { type: Date, default: Date.now },
 });
 
 const Fuel = mongooose.model("fuels", fuelSchema);

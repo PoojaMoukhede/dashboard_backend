@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const secret = "SECRET";
 const Fuel = require("../../Model/Web/Fuel")
 const Expanse = require('../../Model/Web/Expanse')
-
+const { format } = require("date-fns");
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
@@ -214,14 +214,27 @@ router.get("/fuel", async (req, res) => {
     console.error(e);
   }
 });
+router.get("/fuel/curr", async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const currentMonth = format(currentDate, "MMMM"); // Format the current month
+    
+    const results = await Fuel.find({ month: currentMonth });
 
-
-  // router.post("/fuel", async (req, res) => {
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+  
+// expanse
+  // router.post("/expanse", async (req, res) => {
   //   try {
 
-  //     const fuelData = req.body.FuelConsumption;
+  //     // const fuelData = req.body.FuelConsumption;
   //     // const insertedData = await Fuel.create({ FuelConsumption: fuelData });
-  //     const insertedData = await Fuel.create(req.body);
+  //     const insertedData = await Expanse.create(req.body);
 
   
   //     res.json(insertedData);
@@ -231,42 +244,61 @@ router.get("/fuel", async (req, res) => {
   //     console.log(e);
   //   }
   // });
-  // router.get("/fuel", async (req, res) => {
+
+
+  // router.get("/expanse", async (req, res) => {
   //   try {
-  //     const results = await Fuel.find();
+  //     const results = await Expanse.find();
   //     res.json(results);
-  //     console.log("Result in GET:", results);
+  //     // console.log("Result in GET:", results);
   //   } catch (e) {
   //     res.status(400).json({ message: e.message });
   //     console.log(e);
   //   }
   // });
-  
-// expanse
+
   router.post("/expanse", async (req, res) => {
     try {
-
-      // const fuelData = req.body.FuelConsumption;
-      // const insertedData = await Fuel.create({ FuelConsumption: fuelData });
-      const insertedData = await Expanse.create(req.body);
-
+      const { money,month } = req.body;
+      const currentDate = new Date();
+      // const currentMonth = format(currentDate, "MMMM"); // Format the current month
+      
+      const newExpense = new Expanse({
+        month,
+        money,
+      });
   
-      res.json(insertedData);
-      console.log("Inserted data:", insertedData);
-    } catch (e) {
-      res.status(400).json({ message: e.message });
-      console.log(e);
+      await newExpense.save();
+      res.status(201).json(newExpense);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Server error" });
     }
   });
-  router.get("/expanse", async (req, res) => {
-    try {
-      const results = await Expanse.find();
-      res.json(results);
-      // console.log("Result in GET:", results);
-    } catch (e) {
-      res.status(400).json({ message: e.message });
-      console.log(e);
-    }
-  });
+
+
+router.get("/expanse", async (req, res) => {
+  try {
+    const expenses = await Expanse.find();
+    res.json(expenses);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+router.get("/expanse/curr", async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const currentMonth = format(currentDate, "MMMM"); // Format the current month
+    
+    const expenses = await Expanse.find({ month: currentMonth });
+
+    res.json(expenses);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 module.exports = router;
