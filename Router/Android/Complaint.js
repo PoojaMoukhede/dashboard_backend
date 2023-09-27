@@ -79,6 +79,42 @@ router.get("/complaint/:Emp_ID", async (req, res) => {
     console.log(e);
   }
 });
+router.put("/complaint/:id", async (req, res) => {
+  try {
+    
+    const complaint = await Complaint.findOneAndUpdate({ _id: req.params.id }, {status:"Resolved"});
+    if (!complaint) {
+      return res.status(404).json({ error: 'Complaint not found'});
+    }
+
+    res.status(200).json({result: complaint});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// router.put("/complaint/:id", async (req, res) => {
+//   try {
+//     // const id = req.params.id; // Corrected from _id
+//     // const data = req.body
+//     // const complaint = await Complaint.findByIdAndUpdate(
+//     //   id,data
+//     //   // { status: 'Resolved' },
+//     //   // { new: true } // This option ensures that you get the updated complaint
+//     // );
+//     const data = req.body;
+//     const complaint = await Complaint.findOneAndUpdate({ _id: req.params.id }, data);
+//     res.json({ result: complaint });
+//     if (!complaint) {
+//       return res.status(404).json({ error: 'Complaint not found' });
+//     }
+//     res.status(200).json(complaint);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
 
 // router.post('/complaint', async (req, res) => { 
 //   try {
