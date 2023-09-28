@@ -7,6 +7,9 @@ const e_route = require('./Router/Web/AddEmployee');
 const m_route = require('./Router/Web/Manager');
 const event_route = require("./Router/Web/Event")
 const sendEmail = require('./utils/sendMail')
+const canteen_route = require('./Router/Web/Canteen')
+
+
 //Android routing
 const Android_user = require('./Router/Android/User')
 const Clearance_form = require('./Router/Android/ClearanceForm')
@@ -37,6 +40,7 @@ app.use('/', route);
 app.use('/', e_route);
 app.use('/', m_route);
 app.use('/', event_route);
+app.use('/',canteen_route)
 
 
 // Android
