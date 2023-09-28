@@ -3,20 +3,17 @@ const router = express.Router();
 const Canteen = require('../../Model/Web/Canteen')
 const cron = require('node-cron');
 const moment = require('moment-timezone');
-
+const Coupon = require("../../Model/Android/Coupon")
+const User = require("../../Model/Android/User")
 
 // Create a new menu item
 router.post('/menu', async (req, res) => {
     try {
       const { date, menu } = req.body;
-  
-      // Check if the menu already exists for today
       const existingMenu = await Canteen.findOne({ date: date });
-  
       if (existingMenu) {
         return res.status(400).json({ error: 'Menu already exists for this date.' });
       }
-  
       // Create a new menu entry
       const newMenu = new Canteen({ date, menu });
       await newMenu.save();
@@ -31,7 +28,6 @@ router.post('/menu', async (req, res) => {
   // Get today's menu
   router.get('/menu', async (req, res) => {
     try {
-      // Set the timezone to Kolkata (IST)
       const today = moment().tz('Asia/Kolkata').startOf('day');
       const tomorrow = today.clone().add(1, 'days'); // Get the date for tomorrow
   
@@ -40,11 +36,8 @@ router.post('/menu', async (req, res) => {
   
       // Find today's menu
       const todayMenu = await Canteen.findOne({ date: today.toDate() });
-  
       // Find tomorrow's menu
       const tomorrowMenu = await Canteen.findOne({ date: tomorrow.toDate() });
-  
-      // Prepare the response object
       const menuData = {
         today: todayMenu,
         tomorrow: tomorrowMenu,
@@ -58,8 +51,6 @@ router.post('/menu', async (req, res) => {
   });
 
  
-  
-  
 
 // router.get('/menu/today', async (req, res) => {
 //   try {
@@ -107,6 +98,59 @@ router.post('/menu', async (req, res) => {
       console.error('Error in scheduled job:', err);
     }
   });
+
+
+// coupon purched count and post
+  router.post('/menu/buy', async (req, res) => {
+    console.log("Hello Menu Buy POST call");
+  
+    try {
+      const { userId, numberOfCoupons } = req.body;
+      const user = await User.findOne({ _id: userId }); //user id is mongo id
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      let couponPurchase = await Coupon.findOne({ userRef: user._id });
+      if (couponPurchase) {
+        couponPurchase.Coupon_Count.push({ numberOfCoupons });
+        await couponPurchase.save();
+      } else {
+        couponPurchase = new Coupon({
+          Coupon_Count: [{ numberOfCoupons }],
+          userRef: user._id, 
+        });
+        await couponPurchase.save();
+      }
+  
+      res.status(200).json({
+        status: "Success",
+        message: `${numberOfCoupons} menu items purchased successfully`,
+      });
+    } catch (e) {
+      res.status(400).json({ message: e.message });
+      console.log(e);
+    }
+  });
+  
+
+  router.get('/menu/total-coupon-count', async (req, res) => {
+    try {
+      const coupons = await Coupon.find();
+        let totalCouponCount = 0;
+      coupons.forEach((coupon) => {
+        totalCouponCount += coupon.Coupon_Count.reduce((sum, item) => sum + item.numberOfCoupons, 0);
+      });
+  
+      res.json({ totalCouponCount });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+
 
 
 module.exports = router;
