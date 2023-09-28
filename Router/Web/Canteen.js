@@ -135,7 +135,7 @@ router.post('/menu', async (req, res) => {
   });
   
 
-  router.get('/menu/total-coupon-count', async (req, res) => {
+  router.get('/menu/total_coupon_count', async (req, res) => {
     try {
       const coupons = await Coupon.find();
         let totalCouponCount = 0;
