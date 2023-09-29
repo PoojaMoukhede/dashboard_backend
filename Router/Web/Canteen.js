@@ -10,12 +10,18 @@ const User = require("../../Model/Android/User")
 router.post('/menu', async (req, res) => {
     try {
       const { date, menu } = req.body;
-      const existingMenu = await Canteen.findOne({ date: date });
+  
+      // Convert the input date to UTC
+      const inputDateInIST = moment.tz(date, 'Asia/Kolkata');
+      const dateInUTC = inputDateInIST.clone().utc();
+  
+      // Check if a menu already exists for the date in UTC
+      const existingMenu = await Canteen.findOne({ date: dateInUTC.toDate() });
+  
       if (existingMenu) {
         return res.status(400).json({ error: 'Menu already exists for this date.' });
       }
-      // Create a new menu entry
-      const newMenu = new Canteen({ date, menu });
+      const newMenu = new Canteen({ date: dateInUTC.toDate(), menu });
       await newMenu.save();
   
       res.status(201).json(newMenu);
@@ -23,34 +29,32 @@ router.post('/menu', async (req, res) => {
       console.error(err);
       res.status(500).json({ error: 'Internal server error' });
     }
-  });
-  
-  // Get today's menu
-  router.get('/menu', async (req, res) => {
-    try {
-      const today = moment().tz('Asia/Kolkata').startOf('day');
-      const tomorrow = today.clone().add(1, 'days'); // Get the date for tomorrow
-  
-    //   console.log('Today in Kolkata:', today.format());
-    //   console.log('Tomorrow in Kolkata:', tomorrow.format());
-  
-      // Find today's menu
-      const todayMenu = await Canteen.findOne({ date: today.toDate() });
-      // Find tomorrow's menu
-      const tomorrowMenu = await Canteen.findOne({ date: tomorrow.toDate() });
-      const menuData = {
-        today: todayMenu,
-        tomorrow: tomorrowMenu,
-      };
-  
-      res.json(menuData);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
 
- 
+});
+
+// GET route to retrieve today's and tomorrow's menu
+router.get('/menu', async (req, res) => {
+  try {
+    // Use Kolkata time (IST)
+    console.log("Get menu api call")
+    const now = moment().tz('Asia/Kolkata');
+    const today = now.clone().startOf('day');
+    const tomorrow = now.clone().add(1, 'days').startOf('day');
+
+    const todayMenu = await Canteen.findOne({ date: today.toDate() });
+    const tomorrowMenu = await Canteen.findOne({ date: tomorrow.toDate() });
+
+    const menuData = {
+      today: todayMenu,
+      tomorrow: tomorrowMenu,
+    };
+
+    res.json(menuData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // router.get('/menu/today', async (req, res) => {
 //   try {
@@ -100,7 +104,7 @@ router.post('/menu', async (req, res) => {
   });
 
 
-// coupon purched count and post
+// coupon purched count and post , update, delete
   router.post('/menu/buy', async (req, res) => {
     console.log("Hello Menu Buy POST call");
   
@@ -150,7 +154,26 @@ router.post('/menu', async (req, res) => {
     }
   });
 
+  
+  router.put('/menu/:date', async (req, res) => {
+    try {
+      const { date } = req.params;  // 2023-09-28T18:30:00.000+00:00 like this
+      const updatedMenu = req.body.menu; 
+      const existingMenu = await Canteen.findOne({ date: date });
 
+      if (!existingMenu) {
+        return res.status(404).json({ error: 'Menu not found for this date.' });
+      }
+  
+      existingMenu.menu = updatedMenu;
+      await existingMenu.save();
+  
+      res.status(200).json(existingMenu);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 
 
 module.exports = router;

@@ -9,7 +9,7 @@ const attandanceSchema = new mongoose.Schema(
     ],
     userRef: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
   },
-  // { timestamps: true }
+  { timestamps: true }
 );
 const Attandance = mongoose.model("attandances", attandanceSchema);
 
