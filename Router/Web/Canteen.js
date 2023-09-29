@@ -11,7 +11,7 @@ router.post('/menu', async (req, res) => {
     try {
       const { date, menu } = req.body;
   
-      // Convert the input date to UTC
+      // Convert the input date to UTC timezone india
       const inputDateInIST = moment.tz(date, 'Asia/Kolkata');
       const dateInUTC = inputDateInIST.clone().utc();
   
