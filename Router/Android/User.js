@@ -104,7 +104,7 @@ router.post("/emplogin", async (req, res) => {
           userId:userData._id
         });
         // console.log(token)
-        console.log(`crediantial : ${userDataID}`)
+        // console.log(`crediantial : ${userDataID}`)
       } else {
         // Incorrect password
         res.status(401).json({
@@ -134,7 +134,7 @@ router.post("/emplogin", async (req, res) => {
 
         });
         // console.log(token)
-        console.log(`crediantial : ${userData}`)
+        // console.log(`crediantial : ${userData}`)
       } else {
         // Incorrect password
         res.status(401).json({
@@ -167,7 +167,7 @@ router.get('/empdata', async (req, res) => {
     try {
         const results = await User.find();
         res.json(results);
-        console.log( "result in get" ,results )
+        // console.log( "result in get" ,results )
     } catch (e) {
         res.status(400).json({ message: e.message });
         console.log(e);
@@ -179,7 +179,7 @@ router.get('/empdata', async (req, res) => {
     try {
       const results = await Fuel.find();
       res.json(results);
-      console.log("Result in GET:", results);
+      // console.log("Result in GET:", results);
     } catch (e) {
       res.status(400).json({ message: e.message });
       console.log(e);

@@ -10,9 +10,9 @@ const couponSchema = new mongoose.Schema({
           },
           purchaseDate: {
             type: Date,
-            default: Date.now,
+            // default: Date.now,
           }
-      }
+      } 
     ],
     userRef: { type: mongoose.Schema.Types.ObjectId, ref: "users" }
   
