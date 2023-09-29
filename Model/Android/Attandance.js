@@ -5,9 +5,10 @@ const attandanceSchema = new mongoose.Schema(
     Employee_attandance: [
       {
         Emp_status: { type: String },
-        timer :{type:Number}
+        timer :{type:Number},
+        timestamp: { type: Date, default: Date.now }, 
       }, 
-       { timestamps: true }
+      //  { timestamps: true }
     ],
     userRef: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
   },
