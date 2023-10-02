@@ -82,103 +82,20 @@ router.get('/menu', async (req, res) => {
 
 
 // coupon purchesed count and post, update, delete
-  // router.post('/menu/buy', async (req, res) => {
-  //   console.log("Hello Menu Buy POST call");
-  
-  //   try {
-  //     const { userId, numberOfCoupons } = req.body;
-  //     const user = await User.findOne({ _id: userId }); //user id is mongo id
-  
-  //     if (!user) {
-  //       return res.status(404).json({ message: "User not found" });
-  //     }
-  
-  //     let couponPurchase = await Coupon.findOne({ userRef: user._id });
-  //     if (couponPurchase) {
-  //       couponPurchase.Coupon_Count.push({ numberOfCoupons });
-  //       await couponPurchase.save();
-  //     } else {
-  //       couponPurchase = new Coupon({
-  //         Coupon_Count: [{ numberOfCoupons }],
-  //         userRef: user._id, 
-  //       });
-  //       await couponPurchase.save();
-  //     }
-  
-  //     res.status(200).json({
-  //       status: "Success",
-  //       message: `${numberOfCoupons} menu items purchased successfully`,
-  //     });
-  //   } catch (e) {
-  //     res.status(400).json({ message: e.message });
-  //     console.log(e);
-  //   }
-  // });
-
-// router.post('/menu/buy', async (req, res) => {
-//     console.log("Hello Menu Buy POST call");
-  
-//     try {
-//       const { userId, numberOfCoupons, purchaseDate } = req.body;
-//       const user = await User.findOne({ _id: userId }); // user id is a MongoDB ObjectId
-  
-//       if (!user) {
-//         return res.status(404).json({ message: "User not found" });
-//       }
-  
-//       // Get the current date
-//       // const purchaseDate = new Date();
-  
-//       let couponPurchase = await Coupon.findOne({ userRef: user._id });
-  
-//       if (couponPurchase) {
-//         // Check if there's a record for the current date
-//         const existingPurchase = couponPurchase.Coupon_Count.find(
-//           (purchase) => purchase.date === purchaseDate
-//         );
-  
-//         if (existingPurchase) {
-//           existingPurchase.numberOfCoupons += numberOfCoupons;
-//         } else {
-//           couponPurchase.Coupon_Count.push({
-//             date: purchaseDate,
-//             numberOfCoupons,
-//           });
-//         }
-  
-//         await couponPurchase.save();
-//       } else {
-//         couponPurchase = new Coupon({
-//           Coupon_Count: [{ date: purchaseDate, numberOfCoupons }],
-//           userRef: user._id,
-//         });
-//         await couponPurchase.save();
-//       }
-  
-//       res.status(200).json({
-//         status: "Success",
-//         message: `${numberOfCoupons} menu items purchased successfully`,
-//       });
-//     } catch (e) {
-//       res.status(400).json({ message: e.message });
-//       console.log(e);
-//     }
-// });
-  
 router.post('/menu/buy', async (req, res) => {
   console.log("Hello Menu Buy POST call");
   
   try {
     const { userId, numberOfCoupons, purchaseDate } = req.body;
-    const user = await User.findOne({ _id: userId }); // user id is a MongoDB ObjectId
+    const user = await User.findOne({ _id: userId }); 
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     // Parse the purchaseDate as a Date object
-    const parsedPurchaseDate = new Date(purchaseDate);
-
+    const parsedPurchaseDate = purchaseDate;
+console.log(`parsedPurchaseDate : ${parsedPurchaseDate}`);
     let couponPurchase = await Coupon.findOne({ userRef: user._id });
 
     if (couponPurchase) {
@@ -215,7 +132,6 @@ router.post('/menu/buy', async (req, res) => {
   }
 });
 
-  
   //----------
   // router.get('/menu/total_coupon_count', async (req, res) => {
   //   try {
@@ -258,57 +174,57 @@ router.post('/menu/buy', async (req, res) => {
   //   }
   // });
   
-  router.get('/menu/total_coupon_count', async (req, res) => {
-    try {
+  // router.get('/menu/total_coupon_count', async (req, res) => {
+  //   try {
       
-      const now = moment().tz('Asia/Kolkata');
-      const today = now.clone().startOf('day');
+  //     const now = moment().tz('Asia/Kolkata');
+  //     const today = now.clone().startOf('day');
    
-      const canteen = await Canteen.findOne({ date: today });
-      const coupons = await Coupon.find({});
-      // const coupons = await Coupon.find({date:"2023-09-28T18:30:00.000+00:00"});
+  //     const canteen = await Canteen.findOne({ date: today });
+  //     const coupons = await Coupon.find({});
+  //     // const coupons = await Coupon.find({date:"2023-09-28T18:30:00.000+00:00"});
 
-      if (!canteen) {
-        return res.status(404).json({ error: 'Canteen item not found' });
-      }
+  //     if (!canteen) {
+  //       return res.status(404).json({ error: 'Canteen item not found' });
+  //     }
   
-      const canteenDate = formatDate(canteen.date); 
-      // const canteenDate = canteen.date.toLocaleDateString()
-      console.log(`canteenDate : ${canteenDate}`);
+  //     // const canteenDate = formatDate(canteen.date); 
+  //     const canteenDate = canteen.date.toLocaleDateString()
+  //     console.log(`canteenDate : ${canteenDate}`);
   
-      const couponCountsByDate = {};
-      console.log(`coupon : ${coupons}`)
-      coupons.forEach((coupon) => {
-        coupon.Coupon_Count.forEach((purchase) => {
-          const purchaseDate = formatDate(purchase.date); 
-          // const purchaseDate = purchase.date.toLocaleDateString(); 
+  //     const couponCountsByDate = {};
+  //     console.log(`coupon : ${coupons}`)
+  //     coupons.forEach((coupon) => {
+  //       coupon.Coupon_Count.forEach((purchase) => {
+  //         const purchaseDate = formatDate(purchase.date); 
+  //         // const purchaseDate = purchase.date.toLocaleDateString(); 
 
-          console.log(`purchaseDate : ${purchaseDate}`);
+  //         console.log(`purchaseDate : ${purchaseDate}`);
   
-          if (purchaseDate === canteenDate) {
-            if (!couponCountsByDate[purchaseDate]) {
-              couponCountsByDate[purchaseDate] = 0;
-            }
+  //         if (purchaseDate === canteenDate) {
+  //           if (!couponCountsByDate[purchaseDate]) {
+  //             couponCountsByDate[purchaseDate] = 0;
+  //           }
   
-            couponCountsByDate[purchaseDate] += purchase.numberOfCoupons;
-          }
-        });
-      });
+  //           couponCountsByDate[purchaseDate] += purchase.numberOfCoupons;
+  //         }
+  //       });
+  //     });
   
-      res.json(couponCountsByDate);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+  //     res.json(couponCountsByDate);
+  //   } catch (err) {
+  //     console.error(err);
+  //     res.status(500).json({ error: 'Internal server error' });
+  //   }
+  // });
   
-  //function to format a date as "YYYY-MM-DD"
-  function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
+  // // function to format a date as "YYYY-MM-DD"
+  // function formatDate(date) {
+  //   const year = date.getFullYear();
+  //   const month = String(date.getMonth() + 1).padStart(2, '0');
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   return `${year}-${month}-${day}`;
+  // }
   
   
   router.put('/menu/:date', async (req, res) => {
@@ -331,5 +247,52 @@ router.post('/menu/buy', async (req, res) => {
     }
   });
 
+  router.get('/menu/total_coupon_count', async (req, res) => {
+    try {
+      const now = moment().tz('Asia/Kolkata');
+      const today = now.clone().startOf('day');
+      const tomorrow = now.clone().add(1, 'day').startOf('day'); // Get the start of tomorrow
+  
+      const canteen = await Canteen.findOne({ date: today });
+      const coupons = await Coupon.find({});
+  
+      if (!canteen) {
+        return res.status(404).json({ error: 'Canteen item not found' });
+      }
+  
+      const todayDate = today.toISOString(); // Get today's date in ISO format
+    
+      const tomorrowDate = tomorrow.toISOString(); // Get tomorrow's date in ISO format
+      // console.log(`today : ${todayDate} ---------- tomorrow : ${tomorrowDate}`)
+      const couponCounts = {
+        today: 0,
+        tomorrow: 0,
+      };
+  
+      coupons.forEach((coupon) => {
+        if (coupon && coupon.Coupon_Count && Array.isArray(coupon.Coupon_Count)) {
+          coupon.Coupon_Count.forEach((purchase) => {
+            if (purchase && purchase.date) {
+              const purchaseDate = purchase.date.toISOString(); // Get purchase date in ISO format
+  
+              if (purchaseDate === todayDate) {
+                couponCounts.today += purchase.numberOfCoupons;
+              } else if (purchaseDate === tomorrowDate) {
+                couponCounts.tomorrow += purchase.numberOfCoupons;
+              }
+            }
+          });
+        }
+      });
+  
+      res.json(couponCounts);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+  
+  
 
 module.exports = router;

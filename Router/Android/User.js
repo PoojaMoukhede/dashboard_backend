@@ -4,11 +4,10 @@ const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const User = require("../../Model/Android/User")
 const jwt = require("jsonwebtoken");
-// const { default: mongoose } = require("mongoose");
 const secret = "SECRET";
 const Fuel = require("../../Model/Web/Fuel")
 const Expanse = require('../../Model/Web/Expanse')
-const { format } = require("date-fns");
+const { format, subMonths } = require("date-fns"); 
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
@@ -29,7 +28,6 @@ router.post(
       if (repeatedEmail.length === 0) {
        
         const errors = validationResult(req);
-        // console.log("Data from anddroid",res)
         if (!errors.isEmpty()) {
           res.status(400).json({
             status: "Failed By Validator",
@@ -43,7 +41,6 @@ router.post(
           const salt = await bcrypt.genSalt(12);
           bcrypt.hash(req.body.password, salt, async (err, hash) => {
             await User.create({
-              // _id:mongoose.Schema.Types.ObjectId,
               name:req.body.name,
               email: req.body.email,
               password: hash,
@@ -79,64 +76,33 @@ router.post("/emplogin", async (req, res) => {
   console.log('hello login')
 
   try {
-    // Find the user by email
     const userData = await User.findOne({ email: email });
-    // Find the user by Emp_ID
     const userDataID = await User.findOne({Emp_ID:Emp_ID})
 
-// check with employee ID
     if (userDataID) {
       const passwordMatch = await bcrypt.compare(password, userDataID.password);
-
       if (passwordMatch) {
-        // const token = jwt.sign(
-        //   {
-        //     User: userDataID._id,
-        //   },
-        //   secret,
-        //   // { expiresIn: "1h" }
-        //   { expiresIn: "24h" }
-
-        // );
         res.status(200).json({
           status: "Successful",
-          // token: token,
           userId:userData._id
         });
-        // console.log(token)
-        // console.log(`crediantial : ${userDataID}`)
+
       } else {
-        // Incorrect password
         res.status(401).json({
           status: "failed",
           message: "Wrong password",
         });
       }
     }
-    // check with employee email
     else if(userData){
       const passwordMatch = await bcrypt.compare(password, userData.password);
       if (passwordMatch) {
-        // const token = jwt.sign(
-        //   {
-        //     User: userData._id,
-        //   },
-        //   secret,
-        //   // { expiresIn: "1h" }
-        //   { expiresIn: "24h" }
-        // );
-
-        // Respond with a success message and the token
         res.status(200).json({
           status: "Successful",
-          // token: token,
           userId:userData._id
-
         });
-        // console.log(token)
-        // console.log(`crediantial : ${userData}`)
+
       } else {
-        // Incorrect password
         res.status(401).json({
           status: "failed",
           message: "Wrong password",
@@ -145,7 +111,6 @@ router.post("/emplogin", async (req, res) => {
     }
     
     else {
-      // User not found
       res.status(404).json({
         status: "failed",
         message: "No user found",
@@ -300,5 +265,19 @@ router.get("/expanse/curr", async (req, res) => {
   }
 });
 
+
+router.get("/expanse/prev", async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const previousMonth = format(subMonths(currentDate, 1), "MMMM"); // Subtract 1 month from the current date and format it
+
+    const expenses = await Expanse.find({ month: previousMonth });
+
+    res.json(expenses);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 module.exports = router;

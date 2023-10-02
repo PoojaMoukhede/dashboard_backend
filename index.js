@@ -6,7 +6,7 @@ const route = require('./Router/Web/Admin');
 const e_route = require('./Router/Web/AddEmployee');
 const m_route = require('./Router/Web/Manager');
 const event_route = require("./Router/Web/Event")
-const sendEmail = require('./utils/sendMail')
+// const sendEmail = require('./utils/sendMail')
 const canteen_route = require('./Router/Web/Canteen')
 
 
@@ -36,6 +36,10 @@ mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true, useUnifiedTo
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  next();
+});
 app.use('/', route);
 app.use('/', e_route);
 app.use('/', m_route);
@@ -80,25 +84,90 @@ app.get('/', function (req, res) {
 
 
 // for web only
-app.post('/api/test-email', async (req, res) => {
-  console.log("Email api call");
-  try {
-    console.log("Email api call 1");
-    await sendEmail({
-      to: 'pooja3000000000@gmail.com',
-      from: 'poojamoukhede27@gmail.com',
-      subject: 'Does this work?',
-      text: 'Glad you are here .. yes you!',
-      html: '<strong>It is working!!</strong>'
+// app.post('/api/test-email', async (req, res) => {
+//   console.log("Email api call");
+//   try {
+//     console.log("Email api call 1");
+//     await sendEmail({
+//       to: 'pooja3000000000@gmail.com',
+//       from: 'poojamoukhede27@gmail.com',
+//       subject: 'Does this work?',
+//       text: 'Glad you are here .. yes you!',
+//       html: '<strong>It is working!!</strong>'
+//     });
+//     console.log("Email sent successfully");
+//     res.sendStatus(200);
+//   } catch (e) {
+//     console.error("Email send error:", e.response ? e.response.body : e.message);
+//     res.sendStatus(500);
+//   }
+// });
+
+function sendEmail({ recipient_email, OTP }) {
+  return new Promise((resolve, reject) => {
+    var transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.MY_EMAIL,
+        pass: process.env.MY_PASSWORD,
+      },
     });
-    console.log("Email sent successfully");
-    res.sendStatus(200);
-  } catch (e) {
-    console.error("Email send error:", e.response ? e.response.body : e.message);
-    res.sendStatus(500);
-  }
+
+    const mail_configs = {
+      from: process.env.MY_EMAIL,
+      to: recipient_email,
+      subject: "PASSWORD RECOVERY",
+      html: `<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - OTP Email Template</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+  <div style="margin:50px auto;width:70%;padding:20px 0">
+    <div style="border-bottom:1px solid #eee">
+      <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Koding 101</a>
+    </div>
+    <p style="font-size:1.1em">Hi,</p>
+    <p>Thank you for choosing Koding 101. Use the following OTP to complete your Password Recovery Procedure. OTP is valid for 5 minutes</p>
+    <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">${OTP}</h2>
+    <p style="font-size:0.9em;">Regards,<br />Koding 101</p>
+    <hr style="border:none;border-top:1px solid #eee" />
+    <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+      <p>Koding 101 Inc</p>
+      <p>1600 Amphitheatre Parkway</p>
+      <p>California</p>
+    </div>
+  </div>
+</div>
+<!-- partial -->
+  
+</body>
+</html>`,
+    };
+    transporter.sendMail(mail_configs, function (error, info) {
+      if (error) {
+        console.log(error);
+        return reject({ message: `An error has occured` });
+      }
+      return resolve({ message: "Email sent succesfuly" });
+    });
+  });
+}
+
+app.get("/", (req, res) => {
+  console.log(process.env.MY_EMAIL);
 });
 
+app.post("/send_recovery_email", (req, res) => {
+  sendEmail(req.body)
+    .then((response) => res.send(response.message))
+    .catch((error) => res.status(500).send(error.message));
+});
 
 
 app.listen(port,()=>{console.log(`server is up on port ${port}`)});

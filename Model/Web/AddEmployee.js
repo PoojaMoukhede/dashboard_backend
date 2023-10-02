@@ -1,8 +1,6 @@
 const mongooose = require('mongoose')
 
 const employeeSchema = new mongooose.Schema({
-    // employee_id: Number,
-    // _id:mongooose.Schema.Types.ObjectId,
     Emp_id:{ type: String},
     Emp_name: { type: String},
     Emp_email: { type: String ,unique: true},
