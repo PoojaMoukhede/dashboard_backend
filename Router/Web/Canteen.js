@@ -268,14 +268,19 @@ console.log(`parsedPurchaseDate : ${parsedPurchaseDate}`);
         today: 0,
         tomorrow: 0,
       };
-  
+    
       coupons.forEach((coupon) => {
+        console.log("1")
         if (coupon && coupon.Coupon_Count && Array.isArray(coupon.Coupon_Count)) {
+          console.log("2")
           coupon.Coupon_Count.forEach((purchase) => {
+            console.log("3")
             if (purchase && purchase.date) {
+              console.log("4")
               const purchaseDate = purchase.date.toISOString(); // Get purchase date in ISO format
-  
+              console.log(`purchaseDate : ${purchaseDate}`)
               if (purchaseDate === todayDate) {
+                console.log("5")
                 couponCounts.today += purchase.numberOfCoupons;
               } else if (purchaseDate === tomorrowDate) {
                 couponCounts.tomorrow += purchase.numberOfCoupons;

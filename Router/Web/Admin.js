@@ -140,4 +140,14 @@ router.get('/getAdmin', async (req, res) => {
  
 })
 
+
+router.delete("/admin/:id", async (req, res) => {
+  const ID = req.params.id;
+  const admin_data = await Admin.findOneAndDelete({ _id: ID });
+  res.send("Event's data has been Deleted");
+  
+})
+
+
+
 module.exports = router;

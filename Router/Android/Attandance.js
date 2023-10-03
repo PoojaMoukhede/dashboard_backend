@@ -72,13 +72,16 @@ router.get("/attandance/:Emp_ID", async (req, res) => {
   console.log("hello attandance get ID call")
 
   try {
-    const userId = req.params.Emp_ID;
+    const userId = req.params.Emp_ID; // employee ID - 1477
+    console.log(userId)
     const user = await User.findOne({ Emp_ID: userId });
+    console.log(user)
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     const attendance = await Attandance.findOne({ userRef: user._id });
+    console.log(`Employee attandance : ${attendance}`)
 
     if (!attendance) {
       return res.status(404).json({ message: "Attendance record not found" });

@@ -8,6 +8,7 @@ const secret = "SECRET";
 const Fuel = require("../../Model/Web/Fuel")
 const Expanse = require('../../Model/Web/Expanse')
 const { format, subMonths } = require("date-fns"); 
+const Employee = require("../../Model/Web/AddEmployee");
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
@@ -19,12 +20,12 @@ router.post(
   "/empregister",
   body("password"),
   body("confirm_password"),
-  body("email").isEmail(),
+  body("Emp_email").isEmail(),
   async (req, res) => {
     // User.init()
     console.log('hello register')
     try {
-      const repeatedEmail = await User.find({ email: req.body.email });
+      const repeatedEmail = await User.find({ email: req.body.Emp_email });
       if (repeatedEmail.length === 0) {
        
         const errors = validationResult(req);
@@ -41,10 +42,19 @@ router.post(
           const salt = await bcrypt.genSalt(12);
           bcrypt.hash(req.body.password, salt, async (err, hash) => {
             await User.create({
-              name:req.body.name,
-              email: req.body.email,
-              password: hash,
-              Emp_ID:req.body.Emp_ID
+              Emp_ID:req.body.Emp_ID,
+              Emp_name: req.body.Emp_name,
+              Emp_email:req.body.Emp_email,
+              Emp_contact_No: req.body.Emp_contact_No,
+              Emp_department: req.body.naEmp_departmentme,
+              Emp_city: req.body.Emp_city,
+              Emp_state:req.body.Emp_state,
+              Emp_DOB: req.body.Emp_DOB,
+              Emp_joining_date:req.body.Emp_joining_date,
+              Emp_blood_group:req.body.Emp_blood_group,
+              Emp_qualification:req.body.Emp_qualification,
+              Emp_expertise:req.body.Emp_expertise,
+              password: hash
             });
           });
           res.status(200).json({
@@ -70,13 +80,13 @@ router.post(
 );
 
 router.post("/emplogin", async (req, res) => {
-  const email = req.body.email;
+  const email = req.body.Emp_email;
   const Emp_ID = req.body.Emp_ID
   const password = req.body.password;
   console.log('hello login')
 
   try {
-    const userData = await User.findOne({ email: email });
+    const userData = await User.findOne({ Emp_email: email });
     const userDataID = await User.findOne({Emp_ID:Emp_ID})
 
     if (userDataID) {
@@ -139,6 +149,24 @@ router.get('/empdata', async (req, res) => {
     }
    
   })
+
+  router.get('/user/:id', async (req, res) => {  
+    const employeeId = req.params.id;
+    try {
+        const employee = await User.findById(employeeId);
+  
+        if (!employee) {
+            return res.status(404).json({ employee: 'Employee not found' });
+        }
+  
+        res.json(employee);
+    } catch (e) {
+        res.status(400).json({ message: e.message });
+        console.error(e);
+    }
+  });
+
+
 
   router.get("/fuel", async (req, res) => {
     try {
