@@ -4,6 +4,7 @@ const Attandance = require("../../Model/Android/Attandance")
 const jwt = require('jsonwebtoken')
 const secret = "SECRET"
 const User = require("../../Model/Android/User")
+const mongoose = require("mongoose")
 
 // Both checked
 router.get('/attandance', async (req, res) => {  
@@ -68,14 +69,15 @@ const userId = req.body.userId;
 });
 
 
-router.get("/attandance/:Emp_ID", async (req, res) => {
+router.get("/attandance/:id", async (req, res) => {
   console.log("hello attandance get ID call")
 
   try {
-    const userId = req.params.Emp_ID; // employee ID - 1477
+    const userId = req.params.id; //mongo
     console.log(userId)
-    const user = await User.findOne({ Emp_ID: userId });
-    console.log(user)
+   
+    const user = await User.findOne({ _id: userId });
+    console.log(`user : ${user}`)
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

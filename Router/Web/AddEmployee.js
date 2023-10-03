@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const Employee = require('../../Model/Web/AddEmployee')
+// const Employee = require('../../Model/Web/AddEmployee')
+const User = require("../../Model/Android/User")
 const multer = require('multer');
 const xlsx = require('xlsx');
 const upload = multer({ dest: 'uploads/' })
 
-
 // To get/view all employees
-router.get('/employees', async (req, res) => {  
+router.get('/Users', async (req, res) => {  
     try {
-        const results = await Employee.find();
+        const results = await User.find();
         res.json(results);
         // console.log( "result in get" ,results )
     } catch (e) {
@@ -18,11 +18,10 @@ router.get('/employees', async (req, res) => {
     }
    
 })
-
-router.get('/employees/:id', async (req, res) => {  
+router.get('/Users/:id', async (req, res) => {     
   const employeeId = req.params.id;
   try {
-      const employee = await Employee.findById(employeeId);
+      const employee = await User.findById(employeeId);
 
       if (!employee) {
           return res.status(404).json({ employee: 'Employee not found' });
@@ -33,27 +32,27 @@ router.get('/employees/:id', async (req, res) => {
       res.status(400).json({ message: e.message });
       console.error(e);
   }
-});
+}); 
 
 // To add new employee
-router.post('/employees', async (req, res) => { 
-    try {
-        let Employee_data = await Employee.create({
-            ...req.body
-        });
-        //    console.log("Employee_data" ,Employee_data)
-        res.status(201).json(Employee_data);
-    } catch (e) {
-        res.status(400).json({ message: e.message });
-    }
+// router.post('/Users', async (req, res) => { 
+//     try {
+//         let Employee_data = await User.create({
+//             ...req.body
+//         });
+//         //    console.log("Employee_data" ,Employee_data)
+//         res.status(201).json(Employee_data);
+//     } catch (e) {
+//         res.status(400).json({ message: e.message });
+//     }
    
-}) 
+// }) 
 
-router.put('/employees/:id', async (req, res) => {
+router.put('/Users/:id', async (req, res) => {
 
   try {
       const data = req.body;
-      const employee = await Employee.findOneAndUpdate({ _id: req.params.id }, data);
+      const employee = await User.findOneAndUpdate({ _id: req.params.id }, data);
       res.json({ result: employee });
 
   }
@@ -64,9 +63,9 @@ router.put('/employees/:id', async (req, res) => {
 });
 
 //delete
-router.delete("/employees/:id", async (req, res) => {
+router.delete("/Users/:id", async (req, res) => {
   const ID = req.params.id;
-  const employee = await Employee.findOneAndDelete({ _id: ID });
+  const employee = await User.findOneAndDelete({ _id: ID });
   res.send("Employee's data has been Deleted");
   
 })

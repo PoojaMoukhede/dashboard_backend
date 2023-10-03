@@ -266,7 +266,7 @@ console.log(`parsedPurchaseDate : ${parsedPurchaseDate}`);
       // console.log(`today : ${todayDate} ---------- tomorrow : ${tomorrowDate}`)
       const couponCounts = {
         today: 0,
-        tomorrow: 0,
+        tomorrow: 0,     
       };
     
       coupons.forEach((coupon) => {

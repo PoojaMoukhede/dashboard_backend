@@ -8,7 +8,7 @@ const secret = "SECRET";
 const Fuel = require("../../Model/Web/Fuel")
 const Expanse = require('../../Model/Web/Expanse')
 const { format, subMonths } = require("date-fns"); 
-const Employee = require("../../Model/Web/AddEmployee");
+// const Employee = require("../../Model/Web/AddEmployee");
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
@@ -21,11 +21,11 @@ router.post(
   body("password"),
   body("confirm_password"),
   body("Emp_email").isEmail(),
-  async (req, res) => {
+  async (req, res) => {  
     // User.init()
     console.log('hello register')
     try {
-      const repeatedEmail = await User.find({ email: req.body.Emp_email });
+      const repeatedEmail = await User.find({ Emp_email: req.body.Emp_email });
       if (repeatedEmail.length === 0) {
        
         const errors = validationResult(req);
@@ -46,7 +46,7 @@ router.post(
               Emp_name: req.body.Emp_name,
               Emp_email:req.body.Emp_email,
               Emp_contact_No: req.body.Emp_contact_No,
-              Emp_department: req.body.naEmp_departmentme,
+              Emp_department: req.body.Emp_department,
               Emp_city: req.body.Emp_city,
               Emp_state:req.body.Emp_state,
               Emp_DOB: req.body.Emp_DOB,
@@ -86,7 +86,7 @@ router.post("/emplogin", async (req, res) => {
   console.log('hello login')
 
   try {
-    const userData = await User.findOne({ Emp_email: email });
+    const userData = await User.findOne({email: Emp_email });
     const userDataID = await User.findOne({Emp_ID:Emp_ID})
 
     if (userDataID) {
