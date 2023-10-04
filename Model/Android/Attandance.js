@@ -6,7 +6,8 @@ const attandanceSchema = new mongoose.Schema(
       {
         Emp_status: { type: String },
         timer :{type:Number},
-        timestamp: { type: Date, default: Date.now }, 
+        punch_in:{ type: Date, default: Date.now }, 
+        punch_out:{type: Date}
       }, 
       //  { timestamps: true }
     ],

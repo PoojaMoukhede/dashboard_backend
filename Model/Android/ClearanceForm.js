@@ -10,11 +10,13 @@ const clearanceSchema = new mongooose.Schema(
           data: Buffer,
           contentType: String,
         },
+        timestamp: { type: Date, default: Date.now }, 
       },
+      
     ],
     userRef: { type: mongooose.Schema.Types.ObjectId, ref: "users" },
   },
-  { timestamps: true }
+  // { timestamps: true }
 );
 
 const Clearance = mongooose.model("clearances", clearanceSchema);

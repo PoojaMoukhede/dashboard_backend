@@ -10,7 +10,7 @@ const couponSchema = new mongoose.Schema({
           },
           purchaseDate: {
             type: Date,
-            // default: Date.now,
+            default: Date.now,
           }
       } 
     ],

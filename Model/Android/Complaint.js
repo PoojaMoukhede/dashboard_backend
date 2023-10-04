@@ -6,12 +6,13 @@ const complaintSchema = new mongooose.Schema(
       {
         message: { type: String },
         status: { type: String, default: 'Pending' },
+        timestamp: { type: Date, default: Date.now }, 
       },
     ],
     userRef: { type: mongooose.Schema.Types.ObjectId, ref: "users" },
     
   },
-  { timestamps: true }
+  // { timestamps: true }
 );
 
 const Complaint = mongooose.model("complaints", complaintSchema);
