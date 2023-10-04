@@ -57,11 +57,11 @@ router.get('/location', async (req, res) => {
   }
 });
 
-router.get("/location/:Emp_ID", async (req, res) => {
-  console.log("hello Location get Emp_ID call")
+router.get("/location/:id", async (req, res) => {
+  console.log("hello Location get id call")
   try {
-    const empId = req.params.Emp_ID;
-    const user = await User.findOne({ Emp_ID: empId });
+    const empId = req.params.id;
+    const user = await User.findOne({ _id: empId });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

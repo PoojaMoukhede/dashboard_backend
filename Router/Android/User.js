@@ -20,12 +20,12 @@ router.post(
   "/empregister",
   body("password"),
   body("confirm_password"),
-  body("Emp_email").isEmail(),
+  body("email").isEmail(),
   async (req, res) => {  
     // User.init()
     console.log('hello register')
     try {
-      const repeatedEmail = await User.find({ Emp_email: req.body.Emp_email });
+      const repeatedEmail = await User.find({ email: req.body.email });
       if (repeatedEmail.length === 0) {
        
         const errors = validationResult(req);
@@ -44,7 +44,7 @@ router.post(
             await User.create({
               Emp_ID:req.body.Emp_ID,
               Emp_name: req.body.Emp_name,
-              Emp_email:req.body.Emp_email,
+              email:req.body.email,
               Emp_contact_No: req.body.Emp_contact_No,
               Emp_department: req.body.Emp_department,
               Emp_city: req.body.Emp_city,
@@ -80,13 +80,13 @@ router.post(
 );
 
 router.post("/emplogin", async (req, res) => {
-  const email = req.body.Emp_email;
+  const email = req.body.email;
   const Emp_ID = req.body.Emp_ID
   const password = req.body.password;
   console.log('hello login')
 
   try {
-    const userData = await User.findOne({email: Emp_email });
+    const userData = await User.findOne({email: email });
     const userDataID = await User.findOne({Emp_ID:Emp_ID})
 
     if (userDataID) {
