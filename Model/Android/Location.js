@@ -6,11 +6,12 @@ const LocationSchema = new mongooose.Schema(
       {
         startPoint: { type: String },
         endPoint: { type: String },
+        timestamp: { type: Date, default: Date.now }, 
       },
     ],
     userRef: { type: mongooose.Schema.Types.ObjectId, ref: "users" },
   },
-  { timestamps: true }
+  // { timestamps: true }
 );
 
 const Location = mongooose.model("locations", LocationSchema);
