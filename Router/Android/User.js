@@ -96,7 +96,6 @@ router.post("/emplogin", async (req, res) => {
           status: "Successful",
           userId:userData._id
         });
-
       } else {
         res.status(401).json({
           status: "failed",
@@ -111,7 +110,7 @@ router.post("/emplogin", async (req, res) => {
           status: "Successful",
           userId:userData._id
         });
-
+console.log(`user : ${User}`)
       } else {
         res.status(401).json({
           status: "failed",
@@ -142,7 +141,7 @@ router.get('/empdata', async (req, res) => {
     try {
         const results = await User.find();
         res.json(results);
-        // console.log( "result in get" ,results )
+        console.log( "result in get" ,results )
     } catch (e) {
         res.status(400).json({ message: e.message });
         console.log(e);
