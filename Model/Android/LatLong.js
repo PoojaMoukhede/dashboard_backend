@@ -6,7 +6,7 @@ const LatLongSchema = new mongooose.Schema(
       {
         latitude: { type: String },
         longitude: { type: String },
-        distance: { type: Number },
+        distance: { type: Number }, //meters
         timestamp: { type: Date, default: Date.now }, 
       },
     ],

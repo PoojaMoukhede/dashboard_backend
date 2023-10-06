@@ -1,65 +1,63 @@
 const express = require("express");
 const router = express.Router();
-const LatLong = require("../../Model/Android/LatLong")
-const jwt = require('jsonwebtoken')
-const secret = "SECRET"
-const User = require("../../Model/Android/User")
+const LatLong = require("../../Model/Android/LatLong");
+const jwt = require("jsonwebtoken");
+const secret = "SECRET";
+const User = require("../../Model/Android/User");
 
 // Both checked
-router.get('/latLong', async (req, res) => {  
-  console.log("hello LatLong")
-    try {
-      const attendanceRecords = await LatLong.find();
-  
-      if (!attendanceRecords) {
-        return res.status(404).json({ message: "No attendance records found" });
-      }
-  
-      res.status(200).json({
-        status: "Success",
-        message: attendanceRecords,
-      });
-    } catch (e) {
-      res.status(500).json({ message: e.message });
-      console.log(e);
-    }
-   
-})
-
-
-router.post('/latLong', async (req, res) => { 
-  console.log("hello LatLong post call")
-
+router.get("/latLong", async (req, res) => {
+  console.log("hello LatLong");
   try {
-//     const decoded = jwt.verify(req.headers.token, secret);
-//     console.log(decoded)
-//     const userId = decoded.User; // Assuming JWT  contains Emp_ID
-//  console.log(`userId ------ ${userId}`)
-    // Find the user by Emp_ID to ensure it exists
-    const userId = req.body.userId;
-    const user = await User.findOne({ _id: userId });
-    console.log(`user ------ ${user}`)
+    const latLongRecords = await LatLong.find();
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    let attendance = await LatLong.findOne({ userRef: user._id });
-
-    if (attendance) {
-      // If attendance record exists, update it
-      attendance.Details_location.push(req.body);
-      await attendance.save();
-    } else {
-      attendance = new LatLong({
-        Details_location: [req.body],
-        userRef: user._id, // Ensure that user._id is correctly assigned
-      });
-      await attendance.save();
+    if (!latLongRecords) {
+      return res.status(404).json({ message: "No latLong records found" });
     }
 
     res.status(200).json({
       status: "Success",
-      message: "Attendance added successfully",
+      message: latLongRecords,
+    });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+    console.log(e);
+  }
+});
+
+router.post("/latLong", async (req, res) => {
+  console.log("hello LatLong post call");
+
+  try {
+    //     const decoded = jwt.verify(req.headers.token, secret);
+    //     console.log(decoded)
+    //     const userId = decoded.User; // Assuming JWT  contains Emp_ID
+    //  console.log(`userId ------ ${userId}`)
+    // Find the user by Emp_ID to ensure it exists
+    const userId = req.body.userId;
+    const user = await User.findOne({ _id: userId });
+    console.log(`user ------ ${user}`);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    let latLong = await LatLong.findOne({ userRef: user._id });
+
+    if (latLong) {
+      // If latLong record exists, update it
+      latLong.Details_location.push(req.body);
+      await latLong.save();
+    } else {
+      latLong = new LatLong({
+        Details_location: [req.body],
+        userRef: user._id,
+      });
+      await latLong.save();
+    }
+
+    res.status(200).json({
+      status: "Success",
+      message: "latlong added successfully",
     });
   } catch (e) {
     res.status(400).json({ message: e.message });
@@ -67,25 +65,25 @@ router.post('/latLong', async (req, res) => {
   }
 });
 
-
-router.get("/latLong/:Emp_ID", async (req, res) => {
-  console.log("hello LatLong get ID call")
+router.get("/latLong/:id", async (req, res) => {
+  console.log("hello LatLong get ID call");
 
   try {
-    const userId = req.params.Emp_ID;
-    const user = await User.findOne({ Emp_ID: userId });
-
+    const userId = req.params.id;
+    console.log(userId)
+    const user = await User.findOne({ _id: userId });
+    console.log(`user : ${user}`)
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const attendance = await LatLong.findOne({ userRef: user._id });
-
-    if (!attendance) {
-      return res.status(404).json({ message: "Attendance record not found" });
+    const latLong = await LatLong.findOne({ userRef: user._id });
+    console.log(`Employee latLong : ${latLong}`)
+    if (!latLong) {
+      return res.status(404).json({ message: "latLong record not found" });
     }
     res.status(200).json({
       status: "Success",
-      message: attendance,
+      message: latLong,
     });
   } catch (e) {
     res.status(400).json({ message: e.message });
@@ -113,15 +111,27 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
   return distance;
 }
-router.get('/calculate-distance', (req, res) => {   ///calculate-distance?lat1=52.5200&lon1=13.4050&lat2=48.8566&lon2=2.3522
+router.get("/calculate-distance/", (req, res) => {
+  //calculate-distance?lat1=52.5200&lon1=13.4050&lat2=48.8566&lon2=2.3522
+  // ${baseUrl}${endpoint}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`
   const { lat1, lon1, lat2, lon2 } = req.query;
 
   if (!lat1 || !lon1 || !lat2 || !lon2) {
-    return res.status(400).json({ message: 'Invalid input. Please provide lat1, lon1, lat2, and lon2 as query parameters.' });
+    return res
+      .status(400)
+      .json({
+        message:
+          "Invalid input. Please provide lat1, lon1, lat2, and lon2 as query parameters.",
+      });
   }
 
-  const distance = calculateDistance(parseFloat(lat1), parseFloat(lon1), parseFloat(lat2), parseFloat(lon2));
+  const distance = calculateDistance(
+    parseFloat(lat1),
+    parseFloat(lon1),
+    parseFloat(lat2),
+    parseFloat(lon2)
+  );
 
   res.json({ distance: distance.toFixed(2) });
-})
-module.exports= router
+});
+module.exports = router;

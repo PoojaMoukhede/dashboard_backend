@@ -7,7 +7,33 @@ const User = require("../../Model/Android/User")
 const mongoose = require("mongoose")
 
 // Both checked
-router.get('/attandance', async (req, res) => {  
+// router.get('/attandance', async (req, res) => {  
+//   console.log("hello attandance")
+//     try {
+//       const attendanceRecords = await Attandance.find();
+  
+//       if (!attendanceRecords) {
+//         return res.status(404).json({ message: "No attendance records found" });
+//       }
+  
+//       res.status(200).json({
+//         status: "Success",
+//         message: attendanceRecords,
+//       });
+//     } catch (e) {
+//       res.status(500).json({ message: e.message });
+//       console.log(e);
+//     }
+   
+// })
+
+
+
+// get according to date
+
+const moment = require('moment-timezone');
+
+router.get('/attendance', async (req, res) => {  
   console.log("hello attandance")
     try {
       const attendanceRecords = await Attandance.find();
@@ -28,8 +54,38 @@ router.get('/attandance', async (req, res) => {
 })
 
 
-router.post('/attandance', async (req, res) => { 
-  console.log("hello attandance post call")
+
+
+
+
+// router.get('/attendance', async (req, res) => {  
+//   console.log("hello attendance")
+//   try {
+//     const today = moment().tz('Asia/Kolkata').startOf('day');
+//     const todayUtc = today.clone().utc();
+//     console.log(todayUtc.toDate());
+    
+//     const attendanceRecords = await Attandance.find({ Employee_attandance:  todayUtc.toDate()
+//     });
+  
+//     if (!attendanceRecords || attendanceRecords.length === 0) {
+//       return res.status(404).json({ message: "No attendance records found for today" });
+//     }
+  
+//     res.status(200).json({
+//       status: "Success",
+//       message: attendanceRecords,
+//     });
+//   } catch (e) {
+//     res.status(500).json({ message: e.message });
+//     console.log(e);
+//   }
+// })
+
+
+
+router.post('/attendance', async (req, res) => { 
+  console.log("hello attendance post call")
 
   try {
 //     const decoded = jwt.verify(req.headers.token, secret);
