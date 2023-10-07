@@ -5,7 +5,7 @@ const complaintSchema = new mongooose.Schema(
     Message: [
       {
         message: { type: String },
-        status: { type: String, default: 'Pending' },
+        status: { type: String, default: 'Pending'},
         timestamp: { type: Date, default: Date.now }, 
       },
     ],

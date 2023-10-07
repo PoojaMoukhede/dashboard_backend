@@ -85,43 +85,80 @@ router.get('/attendance', async (req, res) => {
 
 
 router.post('/attendance', async (req, res) => { 
-  console.log("hello attendance post call")
+//   console.log("hello attendance post call")
 
-  try {
-//     const decoded = jwt.verify(req.headers.token, secret);
-//     console.log(decoded)
-//     const userId = decoded.User; // Assuming JWT  contains Emp_ID
-//  console.log(`userId ------ ${userId}`)
-const userId = req.body.userId;
-    // Find the user by Emp_ID to ensure it exists
-    const user = await User.findOne({ _id: userId });
-    console.log(`user ------ ${user}`)
+//   try {
+// //     const decoded = jwt.verify(req.headers.token, secret);
+// //     console.log(decoded)
+// //     const userId = decoded.User; // Assuming JWT  contains Emp_ID
+// //  console.log(`userId ------ ${userId}`)
+// const userId = req.body.userId;
+//     // Find the user by Emp_ID to ensure it exists
+//     const user = await User.findOne({ _id: userId });
+//     console.log(`user ------ ${user}`)
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    let attendance = await Attandance.findOne({ userRef: user._id });
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+//     let attendance = await Attandance.findOne({ userRef: user._id });
 
-    if (attendance) {
-      // If attendance record exists, update it
-      attendance.Employee_attandance.push(req.body);
-      await attendance.save();
-    } else {
-      attendance = new Attandance({
-        Employee_attandance: [req.body],
-        userRef: user._id, // Ensure that user._id is correctly assigned
-      });
-      await attendance.save();
-    }
+//     if (attendance) {
+//       // If attendance record exists, update it
+//       attendance.Employee_attandance.push(req.body);
+//       await attendance.save();
+//     } else {
+//       attendance = new Attandance({
+//         Employee_attandance: [req.body],
+//         userRef: user._id, // Ensure that user._id is correctly assigned
+//       });
+//       await attendance.save();
+//     }
 
-    res.status(200).json({
-      status: "Success",
-      message: "Attendance added successfully",
-    });
-  } catch (e) {
-    res.status(400).json({ message: e.message });
-    console.log(e);
+//     res.status(200).json({
+//       status: "Success",
+//       message: "Attendance added successfully",
+//     });
+//   } catch (e) {
+//     res.status(400).json({ message: e.message });
+//     console.log(e);
+//   }
+try {
+  const userId = req.body.userId;
+  const newStatus = req.body.newStatus; 
+
+  const user = await User.findOne({ _id: userId });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
   }
+  let attendance = await Attandance.findOne({ userRef: user._id });
+
+  if (!attendance) {
+    attendance = new Attandance({
+      Employee_attandance: [],
+      userRef: user._id,
+    });
+  }
+
+  const employeeAttendance = attendance.Employee_attandance.find(
+    (attendance) => attendance.Emp_status === "In-Office" 
+  );
+
+  if (!employeeAttendance) {
+    return res.status(404).json({ message: "Employee attendance record not found" });
+  }
+
+  employeeAttendance.Emp_status = newStatus;
+
+  await attendance.save();
+
+  res.status(200).json({
+    status: "Success",
+    message: "Attendance updated successfully",
+  });
+} catch (e) {
+  res.status(400).json({ message: e.message });
+  console.error(e);
+}
 });
 
 

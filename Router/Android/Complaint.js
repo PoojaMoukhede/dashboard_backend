@@ -68,6 +68,7 @@ router.get("/complaint/:Emp_ID", async (req, res) => {
 //     res.status(500).json({ error: 'Internal Server Error' });
 //   }
 // });
+
 router.delete("/complaint/:id", async (req, res) => {
     const complaint = await Complaint.findOneAndDelete({ _id: req.params.id });
     res.send("complaint has been Deleted");
