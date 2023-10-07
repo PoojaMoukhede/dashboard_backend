@@ -109,7 +109,7 @@ const userId = req.body.userId;
     } else {
       attendance = new Attandance({
         Employee_attandance: [req.body],
-        userRef: user._id, // Ensure that user._id is correctly assigned
+        userRef: user._id, 
       });
       await attendance.save();
     }
@@ -188,6 +188,38 @@ router.get("/attandance/:id", async (req, res) => {
   } catch (e) {
     res.status(400).json({ message: e.message });
     console.log(e);
+  }
+});
+
+
+router.put('/attendance/:id', async (req, res) => {
+  try {
+    const userId = req.params.id; // User's _id from the route parameter
+    console.log(userId);
+   
+    const user = await User.findOne({ _id: userId });
+    console.log(`user : ${user}`);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const updatedStatus = req.body.Emp_status;
+
+    const attendance = await Attandance.findOneAndUpdate(
+      { userRef: userId },
+      { Emp_status: updatedStatus },
+      { new: true } 
+    );
+
+    if (!attendance) {
+      return res.status(404).json({ error: 'Attendance not found' });
+    }
+
+    res.status(200).json({ result: attendance });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

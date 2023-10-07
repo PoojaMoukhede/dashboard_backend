@@ -79,50 +79,92 @@ router.get("/location/:id", async (req, res) => {
     res.status(400).json({ message: e.message });
     console.log(e);
   }
+ 
 });
 
 
-router.post('/location', async (req, res) => { 
-  console.log("hello Location post call")
-    try {
-      // console.log(`----------${JSON.stringify(req.headers)}`)
-      // console.log('Header: '+ req.headers)
-      // console.log('Header Token: '+ req.headers.token)
-      // console.log(secret)
-      // const decoded = jwt.verify(req.headers.token, secret);
-      // console.log(decoded)
-      // const userId = decoded.User; 
-     
-    const userId = req.body.userId;
-   console.log(`userId ------ ${userId}`)
-      const user = await User.findOne({ _id: userId });
-      console.log(`user ------ ${user}`)
-  
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      let location = await Location.findOne({ userRef: user._id });
-  
-      if (location) {
-        location.Location_info.push(req.body);
-        await location.save();
-      } else {
-        location = new Location({
-          Location_info: [req.body],
-          userRef: user._id, 
-        });
-        await location.save();
-      }
-  
-      res.status(200).json({
-        status: "Success",
-        message: "Location added successfully",
-      });
-    } catch (e) {
-      res.status(400).json({ message: e.message });
-      console.log(e);
+router.post("/location/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    const { startPoint, endPoint } = req.body;
+    const distance = calculateDistance(
+      startPoint.latitude,
+      startPoint.longitude,
+      endPoint.latitude,
+      endPoint.longitude
+    );
+
+    const locationData = {
+      startPoint: {
+        startPointname: startPoint.startPointname,
+        latitude: startPoint.latitude,
+        longitude: startPoint.longitude,
+      },
+      endPoint: {
+        endPointname: endPoint.endPointname,
+        latitude: endPoint.latitude,
+        longitude: endPoint.longitude,
+      },
+      timestamp: new Date(),
+      distance: distance.toFixed(2), // Round the distance to two decimal places
+    };
+
+    let location = await Location.findOne({ userRef: user._id });
+
+    if (location) {
+      // If the user has existing location data, add the new data to the Location_info array
+      location.Location_info.push(locationData);
+    } else {
+      // If the user does not have existing location data, create a new location document
+      location = new Location({
+        Location_info: [locationData],
+        userRef: user._id,
+      });
+    }
+
+    // Save the location document to the database
+    await location.save();
+
+    res.status(200).json({
+      status: "Success",
+      message: locationData, // Return the added location data
+    });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.error(e);
+  }
 });
+
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  // Convert latitude and longitude values from degrees to radians
+  const radiansLat1 = (Math.PI / 180) * parseFloat(lat1);
+  const radiansLon1 = (Math.PI / 180) * parseFloat(lon1);
+  const radiansLat2 = (Math.PI / 180) * parseFloat(lat2);
+  const radiansLon2 = (Math.PI / 180) * parseFloat(lon2);
+
+  // Calculate the differences in latitude and longitude
+  const deltaLat = radiansLat2 - radiansLat1;
+  const deltaLon = radiansLon2 - radiansLon1;
+
+  // Use the Haversine formula to calculate the distance
+  const earthRadius = 6371; // Earth's radius in kilometers
+  const a =
+    Math.sin(deltaLat / 2) ** 2 +
+    Math.cos(radiansLat1) *
+      Math.cos(radiansLat2) *
+      Math.sin(deltaLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = earthRadius * c; // Distance in kilometers
+
+  return distance; // Return the distance
+}
 
 
 module.exports= router
