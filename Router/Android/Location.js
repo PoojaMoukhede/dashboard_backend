@@ -93,12 +93,12 @@ router.post("/location/:id", async (req, res) => {
     }
 
     const { startPoint, endPoint } = req.body;
-    // const distance = calculateDistance(
-    //   startPoint.latitude,
-    //   startPoint.longitude,
-    //   endPoint.latitude,
-    //   endPoint.longitude
-    // );
+    const distance = calculateDistance(
+      startPoint.latitude,
+      startPoint.longitude,
+      endPoint.latitude,
+      endPoint.longitude
+    );
 
     const locationData = {
       startPoint: {
@@ -112,7 +112,7 @@ router.post("/location/:id", async (req, res) => {
         longitude: endPoint.longitude,
       },
       timestamp: new Date(),
-      // distance: distance.toFixed(2), 
+      distance: distance.toFixed(2), 
     };
 
     let location = await Location.findOne({ userRef: user._id });

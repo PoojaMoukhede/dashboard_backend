@@ -11,8 +11,9 @@ const couponSchema = new mongoose.Schema({
           purchaseDate: {
             type: Date,
             default: Date.now,
-          }
-      } 
+          },
+          menuRef: { type: mongoose.Schema.Types.ObjectId, ref: "canteens" }
+      }
     ],
     userRef: { type: mongoose.Schema.Types.ObjectId, ref: "users" }
   
