@@ -93,12 +93,12 @@ router.post("/location/:id", async (req, res) => {
     }
 
     const { startPoint, endPoint } = req.body;
-    const distance = calculateDistance(
-      startPoint.latitude,
-      startPoint.longitude,
-      endPoint.latitude,
-      endPoint.longitude
-    );
+    // const distance = calculateDistance(
+    //   startPoint.latitude,
+    //   startPoint.longitude,
+    //   endPoint.latitude,
+    //   endPoint.longitude
+    // );
 
     const locationData = {
       startPoint: {
@@ -112,28 +112,28 @@ router.post("/location/:id", async (req, res) => {
         longitude: endPoint.longitude,
       },
       timestamp: new Date(),
-      distance: distance.toFixed(2), // Round the distance to two decimal places
+      // distance: distance.toFixed(2), 
     };
 
     let location = await Location.findOne({ userRef: user._id });
 
     if (location) {
-      // If the user has existing location data, add the new data to the Location_info array
+      
       location.Location_info.push(locationData);
     } else {
-      // If the user does not have existing location data, create a new location document
+   
       location = new Location({
         Location_info: [locationData],
         userRef: user._id,
       });
     }
 
-    // Save the location document to the database
+
     await location.save();
 
     res.status(200).json({
       status: "Success",
-      message: locationData, // Return the added location data
+      message: locationData, 
     });
   } catch (e) {
     res.status(400).json({ message: e.message });

@@ -54,25 +54,40 @@ router.get("/complaint/:Emp_ID", async (req, res) => {
     console.log(e);
   }
 });
-// router.put("/complaint/:id", async (req, res) => {
-//   try {
-    
-//     const complaint = await Complaint.findOneAndUpdate({ _id: req.params.id }, {status:"Resolved"});
-//     if (!complaint) {
-//       return res.status(404).json({ error: 'Complaint not found'});
-//     }
 
-//     res.status(200).json({result: complaint});
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Internal Server Error' });
+
+// router.delete("/complaint/:id", async (req, res) => {
+//   const messageIdToDelete = req.params.id;
+//   const messageIndexToDelete = -1; // Initialize with -1 as a flag if not found
+//   //  const msgID = message._id
+//    console.log(`messageIdToDelete : ${messageIdToDelete}`)
+//   // Find the complaint by userRef
+//   const complaint = await Complaint.findOne({ _id: req.params.id });
+//   console.log(`complaint : ${complaint}`)
+
+//   // Find the index of the message with the specified _id
+//   if (complaint) {
+//     messageIndexToDelete = complaint.Message.message.findIndex(
+//       (message) => message._id === messageIdToDelete
+//     );
+//   }
+
+//   // If the message is found, remove it from the array
+//   if (messageIndexToDelete !== -1) {
+//     complaint.Message.message.splice(messageIndexToDelete, 1);
+//     await complaint.save();
+//     res.send("Complaint has been deleted");
+//   } else {
+//     res.status(404).send("Complaint not found");
 //   }
 // });
 
-router.delete("/complaint/:id", async (req, res) => {
-    const complaint = await Complaint.findOneAndDelete({ _id: req.params.id });
-    res.send("complaint has been Deleted");
-});
+
+
+// router.delete("/complaint/:id", async (req, res) => {
+//     const complaint = await Complaint.findOneAndDelete({ _id: req.params.id });
+//     res.send("complaint has been Deleted");
+// });
 
 router.post('/complaint', async (req, res) => { 
   console.log("hello Complaint post call")
