@@ -16,7 +16,7 @@ const Clearance_form = require('./Router/Android/ClearanceForm')
 const Attandance = require('./Router/Android/Attandance')
 const Location = require('./Router/Android/Location')
 const Complaint = require('./Router/Android/Complaint')
-const LatLong = require('./Router/Android/LatLong')
+// const LatLong = require('./Router/Android/LatLong')
 
 const cors = require('cors');
 app.use(cors())
@@ -53,7 +53,7 @@ app.use('/', Clearance_form);
 app.use('/', Attandance);
 app.use('/', Location);
 app.use('/', Complaint);
-app.use('/', LatLong);
+// app.use('/', LatLong);
 
 
 
