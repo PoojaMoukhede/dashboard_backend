@@ -93,7 +93,7 @@ router.post('/importdata', upload.single('file'), async (req, res) => {
       const importedData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
       console.log(`importedData : ${importedData}`)
   
-      await Employee.insertMany(importedData);
+      await User.insertMany(importedData);
       // console.log(`Employee : ${Employee}`)
       
       res.status(200).json({ message: 'Data imported successfully' });
