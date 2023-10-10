@@ -8,6 +8,7 @@ const m_route = require('./Router/Web/Manager');
 const event_route = require("./Router/Web/Event")
 // const sendEmail = require('./utils/sendMail')
 const canteen_route = require('./Router/Web/Canteen')
+const nodemailer = require("nodemailer")
 
 
 //Android routing
@@ -45,7 +46,7 @@ app.use('/', e_route);
 app.use('/', m_route);
 app.use('/', event_route);
 app.use('/',canteen_route)
-
+ 
 
 // Android
 app.use('/', Android_user);
@@ -84,24 +85,24 @@ app.get('/', function (req, res) {
 
 
 // for web only
-// app.post('/api/test-email', async (req, res) => {
-//   console.log("Email api call");
-//   try {
-//     console.log("Email api call 1");
-//     await sendEmail({
-//       to: 'pooja3000000000@gmail.com',
-//       from: 'poojamoukhede27@gmail.com',
-//       subject: 'Does this work?',
-//       text: 'Glad you are here .. yes you!',
-//       html: '<strong>It is working!!</strong>'
-//     });
-//     console.log("Email sent successfully");
-//     res.sendStatus(200);
-//   } catch (e) {
-//     console.error("Email send error:", e.response ? e.response.body : e.message);
-//     res.sendStatus(500);
-//   }
-// });
+app.post('/api/test-email', async (req, res) => {
+  console.log("Email api call");
+  try {
+    console.log("Email api call 1");
+    await sendEmail({
+      to: 'pooja3000000000@gmail.com',
+      from: 'poojamoukhede27@gmail.com',
+      subject: 'Does this work?',
+      text: 'Glad you are here .. yes you!',
+      html: '<strong>It is working!!</strong>'
+    });
+    console.log("Email sent successfully");
+    res.sendStatus(200);
+  } catch (e) {
+    console.error("Email send error:", e.response ? e.response.body : e.message);
+    res.sendStatus(500);
+  }
+});
 
 function sendEmail({ recipient_email, OTP }) {
   return new Promise((resolve, reject) => {
@@ -109,7 +110,7 @@ function sendEmail({ recipient_email, OTP }) {
       service: "gmail",
       auth: {
         user: process.env.MY_EMAIL,
-        pass: process.env.MY_PASSWORD,
+        pass: process.env.API_KEY,
       },
     });
 
@@ -120,10 +121,8 @@ function sendEmail({ recipient_email, OTP }) {
       html: `<!DOCTYPE html>
 <html lang="en" >
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"> 
   <title>CodePen - OTP Email Template</title>
-  
-
 </head>
 <body>
 <!-- partial:index.partial.html -->
@@ -165,9 +164,37 @@ app.get("/", (req, res) => {
 
 app.post("/send_recovery_email", (req, res) => {
   sendEmail(req.body)
+  // main()
     .then((response) => res.send(response.message))
     .catch((error) => res.status(500).send(error.message));
 });
+
+ 
+
+// var transport = nodemailer.createTransport({
+//   host: "sandbox.smtp.mailtrap.io",
+//   port: 2525,
+//   auth: {
+//     user: "edd4bd511f722d",
+//     pass: "8fc69c9724dd75"
+//   }
+// });
+
+// async function main() {
+//   const info = await transport.sendMail({
+//     to: 'poojamoukhede27@gmail.com',
+//     from: 'pooja3000000000@gmail.com',
+//     subject: "Hello ✔", 
+//     text: "Hello world?", 
+//     html: "<b>Hello world?</b>", 
+//   });
+
+//   console.log("Message sent: %s", info.messageId);
+
+// }
+
+
+
 
 
 app.listen(port,()=>{console.log(`server is up on port ${port}`)});
