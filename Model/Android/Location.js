@@ -25,13 +25,13 @@ const LocationSchema = new mongoose.Schema(
      {
       startPoint: {
         startPointname: { type: String },
-        latitude: { type: String },
-        longitude: { type: String },
+        startLatitude: { type: String },
+        startLongitude: { type: String },
       },
       endPoint: {
         endPointname: { type: String },
-        latitude: { type: String },
-        longitude: { type: String },
+        endLatitude: { type: String },
+        endLongitude: { type: String },
       },
       distance: { type: Number },
       timestamp: { type: Date, default: Date.now },

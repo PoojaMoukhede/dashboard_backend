@@ -1,33 +1,34 @@
-const express = require('express');
+const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const  bodyParser = require('body-parser');
-const route = require('./Router/Web/Admin');
-const e_route = require('./Router/Web/AddEmployee');
-const m_route = require('./Router/Web/Manager');
-const event_route = require("./Router/Web/Event")
+const bodyParser = require("body-parser");
+const route = require("./Router/Web/Admin");
+const e_route = require("./Router/Web/AddEmployee");
+const m_route = require("./Router/Web/Manager");
+const event_route = require("./Router/Web/Event");
 // const sendEmail = require('./utils/sendMail')
-const canteen_route = require('./Router/Web/Canteen')
-const nodemailer = require("nodemailer")
-
-
+const canteen_route = require("./Router/Web/Canteen");
+const nodemailer = require("nodemailer");
+const path = require('path')
 //Android routing
-const Android_user = require('./Router/Android/User')
-const Clearance_form = require('./Router/Android/ClearanceForm')
-const Attandance = require('./Router/Android/Attandance')
-const Location = require('./Router/Android/Location')
-const Complaint = require('./Router/Android/Complaint')
+const Android_user = require("./Router/Android/User");
+const Clearance_form = require("./Router/Android/ClearanceForm");
+const Attandance = require("./Router/Android/Attandance");
+const Location = require("./Router/Android/Location");
+const Complaint = require("./Router/Android/Complaint");
 // const LatLong = require('./Router/Android/LatLong')
 
-const cors = require('cors');
-app.use(cors())
-require('dotenv').config();
-const port =process.env.PORT || 8080;
+const cors = require("cors");
+app.use(cors());
+require("dotenv").config();
+const port = process.env.PORT || 8080;
 
-
-
-mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-.then((result) => { 
+mongoose
+  .connect(process.env.DATABASE_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then((result) => {
     console.log("DB connected successfully");
   })
   .catch((err) => {
@@ -41,28 +42,24 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   next();
 });
-app.use('/', route);
-app.use('/', e_route);
-app.use('/', m_route);
-app.use('/', event_route);
-app.use('/',canteen_route)
- 
+app.use("/", route);
+app.use("/", e_route);
+app.use("/", m_route);
+app.use("/", event_route);
+app.use("/", canteen_route);
 
 // Android
-app.use('/', Android_user);
-app.use('/', Clearance_form);
-app.use('/', Attandance);
-app.use('/', Location);
-app.use('/', Complaint);
+app.use("/", Android_user);
+app.use("/", Clearance_form);
+app.use("/", Attandance);
+app.use("/", Location);
+app.use("/", Complaint);
 // app.use('/', LatLong);
-
-
-
-app.get('/', function (req, res) {
-  res.send('Hello World')
-  console.log("Browser request")
-  
-})
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.get("/", function (req, res) {
+  res.send("Hello World");
+  console.log("Browser request");
+});
 
 // app.post('/api/test-email', async(req, res)=>{
 //   console.log("Email api call")
@@ -83,23 +80,25 @@ app.get('/', function (req, res) {
 //   }
 // });
 
-
 // for web only
-app.post('/api/test-email', async (req, res) => {
+app.post("/api/test-email", async (req, res) => {
   console.log("Email api call");
   try {
     console.log("Email api call 1");
     await sendEmail({
-      to: 'pooja3000000000@gmail.com',
-      from: 'poojamoukhede27@gmail.com',
-      subject: 'Does this work?',
-      text: 'Glad you are here .. yes you!',
-      html: '<strong>It is working!!</strong>'
+      to: "pooja3000000000@gmail.com",
+      from: "poojamoukhede27@gmail.com",
+      subject: "Does this work?",
+      text: "Glad you are here .. yes you!",
+      html: "<strong>It is working!!</strong>",
     });
     console.log("Email sent successfully");
     res.sendStatus(200);
   } catch (e) {
-    console.error("Email send error:", e.response ? e.response.body : e.message);
+    console.error(
+      "Email send error:",
+      e.response ? e.response.body : e.message
+    );
     res.sendStatus(500);
   }
 });
@@ -164,12 +163,10 @@ app.get("/", (req, res) => {
 
 app.post("/send_recovery_email", (req, res) => {
   sendEmail(req.body)
-  // main()
+    // main()
     .then((response) => res.send(response.message))
     .catch((error) => res.status(500).send(error.message));
 });
-
- 
 
 // var transport = nodemailer.createTransport({
 //   host: "sandbox.smtp.mailtrap.io",
@@ -184,19 +181,17 @@ app.post("/send_recovery_email", (req, res) => {
 //   const info = await transport.sendMail({
 //     to: 'poojamoukhede27@gmail.com',
 //     from: 'pooja3000000000@gmail.com',
-//     subject: "Hello ✔", 
-//     text: "Hello world?", 
-//     html: "<b>Hello world?</b>", 
+//     subject: "Hello ✔",
+//     text: "Hello world?",
+//     html: "<b>Hello world?</b>",
 //   });
 
 //   console.log("Message sent: %s", info.messageId);
 
 // }
 
+app.listen(port, () => {
+  console.log(`server is up on port ${port}`);
+});
 
-
-
-
-app.listen(port,()=>{console.log(`server is up on port ${port}`)});
-
-// app.keepAliveTimeout = 60000; 
+// app.keepAliveTimeout = 60000;

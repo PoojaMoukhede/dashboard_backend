@@ -13,32 +13,7 @@ const upload = multer({ storage: storage });
 // Both Checked
 // GET all clearances
 router.get("/form", async (req, res) => {
-
-  // if (req.headers.token !== null) {
-  //       jwt.verify(req.headers.token, secret, (err, user) => {
-  //         if (err) console.log(err.message);
-  //         else req.user = user.data;
-  //       });
-  //       try {
-  //         const data = await Clearance.find({ userRef: req.user });
-  //         res.status(200).json({
-  //           status: "Sucess",
-  //           message: data,
-  //         });
-  //       } catch (error) {
-  //         res.status(500).json({
-  //           status: "Failed",
-  //           message: error.message,
-  //         });
-  //       }
-  //     } else {
-  //       res.status(500).json({
-  //         status: "Failed",
-  //         message: "Please Refresh the Page",
-  //       });
-  //     }
   console.log("hello clearance get call")
-
   try {
     const formRecord = await Clearance.find();
 
@@ -57,14 +32,43 @@ router.get("/form", async (req, res) => {
 });
 
 // POST a new clearance
-router.post("/form", upload.single("image"), async (req, res) => {
-  console.log("hello attandance post call")
+// router.post("/form", upload.single("image"), async (req, res) => {
+//   console.log("hello attandance post call")
+//   try {
+//     const userId = req.body.userId;
+//     const user = await User.findOne({ _id: userId });
+//     console.log(`user ------ ${user}`)
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+//     let clearance_data = await Clearance.findOne({ userRef: user._id });
+
+//     if (clearance_data) {
+//       // If clearance_data record exists, update it
+//       clearance_data.FormData.push(req.body);
+//       await clearance_data.save();
+//     } else {
+//       clearance_data = new Clearance({
+//         FormData: [req.body],
+//         userRef: user._id, // Ensure that user._id is correctly assigned
+//       });
+//       await clearance_data.save();
+//     }
+
+//     res.status(200).json({
+//       status: "Success",
+//       message: "Clearance form added successfully",
+//     });
+//   } catch (e) {
+//     res.status(400).json({ message: e.message });
+//     console.log(e);
+//   }
+// });
+
+router.post("/form", upload.array("images"), async (req, res) => {
+  console.log("hello attendance post call");
   try {
-//     const decoded = jwt.verify(req.headers.token, secret);
-//     console.log(decoded)
-//     const userId = decoded.User; // Assuming JWT  contains Emp_ID
-//  console.log(`userId ------ ${userId}`)
-    // Find the user by Emp_ID to ensure it exists
     const userId = req.body.userId;
     const user = await User.findOne({ _id: userId });
     console.log(`user ------ ${user}`)
@@ -72,16 +76,16 @@ router.post("/form", upload.single("image"), async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
     let clearance_data = await Clearance.findOne({ userRef: user._id });
 
     if (clearance_data) {
-      // If clearance_data record exists, update it
-      clearance_data.FormData.push(req.body);
+      clearance_data.FormData.push({ userId, images: req.files }); 
       await clearance_data.save();
     } else {
       clearance_data = new Clearance({
-        FormData: [req.body],
-        userRef: user._id, // Ensure that user._id is correctly assigned
+        FormData: [{ userId, images: req.files }], 
+        userRef: user._id,
       });
       await clearance_data.save();
     }
@@ -96,13 +100,12 @@ router.post("/form", upload.single("image"), async (req, res) => {
   }
 });
 
-
-router.get("/form/:Emp_ID", async (req, res) => {
+router.get("/form/:id", async (req, res) => {
   console.log("hello attandance get ID call")
 
   try {
-    const userId = req.params.Emp_ID;
-    const user = await User.findOne({ Emp_ID: userId });
+    const userId = req.params.id;
+    const user = await User.findOne({ _id: userId });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -122,6 +125,45 @@ router.get("/form/:Emp_ID", async (req, res) => {
     console.log(e);
   }
 });
+
+// router.get("/form/:id", async (req, res) => {
+//   console.log("hello attandance get ID call");
+
+//   try {
+//     const userId = req.params.id;
+//     const user = await User.findOne({ _id: userId });
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+//     const record = await Clearance.findOne({ userRef: user._id });
+
+//     if (!record) {
+//       return res.status(404).json({ message: "Record not found" });
+//     }
+
+//     // Send back the record with images as URLs
+//     const recordWithImages = {
+//       _id: record._id,
+//       userRef: record.userRef,
+//       FormData: record.FormData.map((formData) => ({
+//         Transport_type: formData.Transport_type,
+//         Total_expense: formData.Total_expense,
+//         // Assuming you have stored image file paths in the database
+//         images: formData.images.data ? `/uploads/${formData.images.data}` : null,
+//         timestamp: formData.timestamp,
+//       })),
+//     };
+
+//     res.status(200).json({
+//       status: "Success",
+//       message: recordWithImages,
+//     });
+//   } catch (e) {
+//     res.status(400).json({ message: e.message });
+//     console.log(e);
+//   }
+// });
 
 
 module.exports = router;
