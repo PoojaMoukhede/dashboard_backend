@@ -94,22 +94,22 @@ router.post("/location/:id", async (req, res) => {
 
     const { startPoint, endPoint } = req.body;
     const distance = calculateDistance(
-      startPoint.latitude,
-      startPoint.longitude,
-      endPoint.latitude,
-      endPoint.longitude
+      startPoint.startLatitude,
+      startPoint.startLongitude,
+      endPoint.endLatitude,
+      endPoint.endLongitude
     );
 
     const locationData = {
       startPoint: {
         startPointname: startPoint.startPointname,
-        latitude: startPoint.latitude,
-        longitude: startPoint.longitude,
+        startLatitude: startPoint.startLatitude,
+        startLongitude: startPoint.startLongitude,
       },
       endPoint: {
         endPointname: endPoint.endPointname,
-        latitude: endPoint.latitude,
-        longitude: endPoint.longitude,
+        endLatitude: endPoint.endLatitude,
+        endLongitude: endPoint.endLongitude,
       },
       timestamp: new Date(),
       distance: distance.toFixed(2), 
