@@ -80,11 +80,11 @@ router.post("/form", upload.array("images"), async (req, res) => {
     let clearance_data = await Clearance.findOne({ userRef: user._id });
 
     if (clearance_data) {
-      clearance_data.FormData.push({ userId, images: req.files }); 
+      clearance_data.FormData.push(req.body); 
       await clearance_data.save();
     } else {
       clearance_data = new Clearance({
-        FormData: [{ userId, images: req.files }], 
+        FormData: [req.body], 
         userRef: user._id,
       });
       await clearance_data.save();
