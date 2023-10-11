@@ -9,7 +9,8 @@ const clearanceSchema = new mongooose.Schema(
         images: {
           data: Buffer,
           contentType: String,
-        },
+        }, 
+        ImageName:{type: String},
         timestamp: { type: Date, default: Date.now }, 
       },
       
