@@ -98,66 +98,6 @@ router.put("/attendance/:id", async (req, res) => {
 
 
 
-router.post("/attendance", async (req, res) => {
-  console.log("hello attendance post call");
-
-  try {
-    const userId = req.body.userId;
-    const user = await User.findOne({ _id: userId });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    let attendance = await Attandance.findOne({ userRef: user._id });
-
-    if (!attendance) {
-      attendance = new Attandance({
-        Employee_attandance: [],
-        userRef: user._id,
-      });
-    }
-
-    const isPunchIn = req.body.isPunchIn; // Assuming you have isPunchIn in your request
-
-    if (isPunchIn) {
-      // Handle Punch In
-      attendance.Employee_attandance.push({
-        action: "Punch In",
-        Emp_status: "On Site",
-        timer: 0, // Reset timer to 0 when Punch In
-        timestamp: new Date(),
-      });
-    } else {
-      // Handle Punch Out
-      const lastEntry = attendance.Employee_attandance[attendance.Employee_attandance.length - 1];
-      if (lastEntry && lastEntry.action === "Punch In") {
-        // Calculate the time spent on-site
-        const punchInTime = lastEntry.timestamp.getTime();
-        const punchOutTime = new Date().getTime();
-        const timeSpent = punchOutTime - punchInTime;
-
-        // Update the timer, Emp_status, and action for the last Punch In entry
-        lastEntry.timer = timeSpent;
-        lastEntry.Emp_status = "In Office";
-        lastEntry.action = "Punch Out";
-      } else {
-        // Handle Punch Out without a corresponding Punch In
-        return res.status(400).json({ message: "Punch Out without a Punch In entry." });
-      }
-    }
-
-    await attendance.save();
-
-    res.status(200).json({
-      status: "Success",
-      message: "Attendance updated successfully",
-    });
-  } catch (e) {
-    res.status(400).json({ message: e.message });
-    console.log(e);
-  }
-});
 // router.post("/attendance", async (req, res) => {
 //   console.log("hello attendance post call");
 
@@ -178,21 +118,9 @@ router.post("/attendance", async (req, res) => {
 //       });
 //     }
 
-//     const isPunchIn = req.body.isPunchIn;
-//     const timer = req.body.timer; // Assuming you have timer in your request
+//     const isPunchIn = req.body.isPunchIn; // Assuming you have isPunchIn in your request
 
 //     if (isPunchIn) {
-//       // Check if the user has already punched in today
-//       const lastPunchInEntry = attendance.Employee_attandance
-//         .slice()
-//         .reverse()
-//         .find((entry) => entry.action === "Punch In");
-      
-//       if (lastPunchInEntry) {
-//         // User has already punched in today
-//         return res.status(400).json({ message: "You have already punched in for today." });
-//       }
-
 //       // Handle Punch In
 //       attendance.Employee_attandance.push({
 //         action: "Punch In",
@@ -204,23 +132,15 @@ router.post("/attendance", async (req, res) => {
 //       // Handle Punch Out
 //       const lastEntry = attendance.Employee_attandance[attendance.Employee_attandance.length - 1];
 //       if (lastEntry && lastEntry.action === "Punch In") {
-        
+//         // Calculate the time spent on-site
 //         const punchInTime = lastEntry.timestamp.getTime();
 //         const punchOutTime = new Date().getTime();
 //         const timeSpent = punchOutTime - punchInTime;
-
-//         // Calculate overtime and below-time
-//         const overtimeHours = (timeSpent - 9 * 60 * 60 * 1000) / (60 * 60 * 1000);
-//         const belowTimeHours = Math.max(0, 9 - timeSpent / (60 * 60 * 1000));
 
 //         // Update the timer, Emp_status, and action for the last Punch In entry
 //         lastEntry.timer = timeSpent;
 //         lastEntry.Emp_status = "In Office";
 //         lastEntry.action = "Punch Out";
-
-//         // Add overtime and below-time to the response
-//         attendance.overtimeHours = overtimeHours;
-//         attendance.belowTimeHours = belowTimeHours;
 //       } else {
 //         // Handle Punch Out without a corresponding Punch In
 //         return res.status(400).json({ message: "Punch Out without a Punch In entry." });
@@ -238,6 +158,86 @@ router.post("/attendance", async (req, res) => {
 //     console.log(e);
 //   }
 // });
+router.post("/attendance", async (req, res) => {
+  console.log("hello attendance post call");
+
+  try {
+    const userId = req.body.userId;
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let attendance = await Attandance.findOne({ userRef: user._id });
+
+    if (!attendance) {
+      attendance = new Attandance({
+        Employee_attandance: [],
+        userRef: user._id,
+      });
+    }
+
+    const isPunchIn = req.body.isPunchIn;
+    const timer = req.body.timer; // Assuming you have timer in your request
+
+    if (isPunchIn) {
+      // Check if the user has already punched in today
+      const lastPunchInEntry = attendance.Employee_attandance
+        .slice()
+        .reverse()
+        .find((entry) => entry.action === "Punch In");
+      
+      if (lastPunchInEntry) {
+        // User has already punched in today
+        return res.status(400).json({ message: "You have already punched in for today." });
+      }
+
+      // Handle Punch In
+      attendance.Employee_attandance.push({
+        action: "Punch In",
+        Emp_status: "On Site",
+        timer: 0, // Reset timer to 0 when Punch In
+        timestamp: new Date(),
+      });
+    } else {
+      // Handle Punch Out
+      const lastEntry = attendance.Employee_attandance[attendance.Employee_attandance.length - 1];
+      if (lastEntry && lastEntry.action === "Punch In") {
+        
+        const punchInTime = lastEntry.timestamp.getTime();
+        const punchOutTime = new Date().getTime();
+        const timeSpent = punchOutTime - punchInTime;
+
+        // Calculate overtime and below-time
+        const overtimeHours = (timeSpent - 9 * 60 * 60 * 1000) / (60 * 60 * 1000);
+        const belowTimeHours = Math.max(0, 9 - timeSpent / (60 * 60 * 1000));
+
+        // Update the timer, Emp_status, and action for the last Punch In entry
+        lastEntry.timer = timeSpent;
+        lastEntry.Emp_status = "In Office";
+        lastEntry.action = "Punch Out";
+
+        // Add overtime and below-time to the response
+        attendance.overtimeHours = overtimeHours;
+        attendance.belowTimeHours = belowTimeHours;
+      } else {
+        // Handle Punch Out without a corresponding Punch In
+        return res.status(400).json({ message: "Punch Out without a Punch In entry." });
+      }
+    }
+
+    await attendance.save();
+
+    res.status(200).json({
+      status: "Success",
+      message: "Attendance updated successfully",
+    });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.log(e);
+  }
+});
 
 // router.post("/attendance", async (req, res) => {
 //   console.log("hello attendance post call");

@@ -84,8 +84,9 @@ router.get("/location/:id", async (req, res) => {
 
 
 router.post("/location/:id", async (req, res) => {
+  console.log("pOST CALL LOCATION")
   try {
-    console.log("pOST CALL LOCATION")
+    
     const userId = req.params.id;
     const user = await User.findOne({ _id: userId });
 
