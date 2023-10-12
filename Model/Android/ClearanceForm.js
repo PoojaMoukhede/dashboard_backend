@@ -17,7 +17,6 @@ const clearanceSchema = new mongooose.Schema(
     ],
     userRef: { type: mongooose.Schema.Types.ObjectId, ref: "users" },
   },
-  // { timestamps: true }
 );
 
 const Clearance = mongooose.model("clearances", clearanceSchema);
