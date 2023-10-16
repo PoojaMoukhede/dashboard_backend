@@ -16,7 +16,7 @@ router.get('/attendance', async (req, res) => {
   try {
     const today = moment().tz('Asia/Kolkata').startOf('day');
     const todayUtc = today.clone().utc();
-    console.log(todayUtc.toDate());
+    // console.log(todayUtc.toDate());
 
     const attendanceRecords = await Attandance.find({ Employee_attandance:  todayUtc.toDate()
     });
@@ -181,13 +181,15 @@ router.post("/attendance", async (req, res) => {
     const isPunchIn = req.body.isPunchIn;
     const timer = req.body.timer; // Assuming you have timer in your request
 
+    let totalWorkedHours = 0; // Initialize totalWorkedHours to 0
+
     if (isPunchIn) {
       // Check if the user has already punched in today
       const lastPunchInEntry = attendance.Employee_attandance
         .slice()
         .reverse()
         .find((entry) => entry.action === "Punch In");
-      
+
       if (lastPunchInEntry) {
         // User has already punched in today
         return res.status(400).json({ message: "You have already punched in for today." });
@@ -204,27 +206,31 @@ router.post("/attendance", async (req, res) => {
       // Handle Punch Out
       const lastEntry = attendance.Employee_attandance[attendance.Employee_attandance.length - 1];
       if (lastEntry && lastEntry.action === "Punch In") {
-        
         const punchInTime = lastEntry.timestamp.getTime();
         const punchOutTime = new Date().getTime();
         const timeSpent = punchOutTime - punchInTime;
 
-        // Calculate overtime and below-time
-        const overtimeHours = (timeSpent - 9 * 60 * 60 * 1000) / (60 * 60 * 1000);
-        const belowTimeHours = Math.max(0, 9 - timeSpent / (60 * 60 * 1000));
+        // Calculate total worked hours
+        totalWorkedHours = timeSpent / (60 * 60 * 1000);
 
         // Update the timer, Emp_status, and action for the last Punch In entry
         lastEntry.timer = timeSpent;
         lastEntry.Emp_status = "In Office";
         lastEntry.action = "Punch Out";
-
-        // Add overtime and below-time to the response
-        attendance.overtimeHours = overtimeHours;
-        attendance.belowTimeHours = belowTimeHours;
       } else {
         // Handle Punch Out without a corresponding Punch In
         return res.status(400).json({ message: "Punch Out without a Punch In entry." });
       }
+    }
+
+    // Calculate overtime and below-time based on total worked hours
+    let overtimeHours = 0;
+    let belowTimeHours = 0;
+
+    if (totalWorkedHours > 9) {
+      overtimeHours = Math.floor(totalWorkedHours - 9);
+    } else if (totalWorkedHours < 9) {
+      belowTimeHours = Math.floor(9 - totalWorkedHours);
     }
 
     await attendance.save();
@@ -232,12 +238,16 @@ router.post("/attendance", async (req, res) => {
     res.status(200).json({
       status: "Success",
       message: "Attendance updated successfully",
+      overtimeHours: overtimeHours,
+      belowTimeHours: belowTimeHours,
     });
   } catch (e) {
     res.status(400).json({ message: e.message });
     console.log(e);
   }
 });
+
+
 
 // router.post("/attendance", async (req, res) => {
 //   console.log("hello attendance post call");

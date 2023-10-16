@@ -125,7 +125,6 @@ function sendEmail({ recipient_email, OTP }) {
   <title>CodePen - OTP Email Template</title>
 </head>
 <body>
-<!-- partial:index.partial.html -->
 <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
   <div style="margin:50px auto;width:70%;padding:20px 0">
     <div style="border-bottom:1px solid #eee">
@@ -143,7 +142,6 @@ function sendEmail({ recipient_email, OTP }) {
     </div>
   </div>
 </div>
-<!-- partial -->
   
 </body>
 </html>`,

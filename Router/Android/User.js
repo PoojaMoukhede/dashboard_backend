@@ -6,10 +6,7 @@ const User = require("../../Model/Android/User");
 const jwt = require("jsonwebtoken");
 const secret = "SECRET";
 const Fuel = require("../../Model/Web/Fuel");
-const Expanse = require("../../Model/Web/Expanse");
 const { format, subMonths } = require("date-fns");
-// const Employee = require("../../Model/Web/AddEmployee");
-
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
@@ -41,7 +38,7 @@ router.post(
           bcrypt.hash(req.body.password, salt, async (err, hash) => {
             await User.create({
               Emp_ID: req.body.Emp_ID,
-              Emp_name: req.body.Emp_name,
+              Emp_Emp_name: req.body.Emp_Emp_name,
               email: req.body.email,
               Emp_contact_No: req.body.Emp_contact_No,
               Emp_department: req.body.Emp_department,
@@ -141,6 +138,57 @@ router.get("/empdata", async (req, res) => {
   }
 });
 
+// for birthday and work anniversary updated 
+
+router.get('/updates', async (req, res) => {
+  console.log('get request by android');
+  try {
+    const users = await User.find();
+
+    // Get the current month and year
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // Months are 0-indexed, so add 1
+    const currentYear = currentDate.getFullYear();
+
+    const usersWithBirthday = [];
+    const usersWithWorkAnniversary = [];
+
+    users.forEach((user) => {
+      const dob = new Date(user.Emp_DOB);
+      const joinDate = new Date(user.Emp_joining_date);
+
+      if (dob.getMonth() + 1 === currentMonth) {
+        usersWithBirthday.push({
+          Emp_name: user.Emp_name,
+          date: `${dob.getDate()}/${currentMonth}/${currentYear}`,
+          type: 'birthday',
+        });
+      }
+
+      const joinMonth = joinDate.getMonth() + 1;
+      if (joinMonth === currentMonth) {
+        usersWithWorkAnniversary.push({
+          Emp_name: user.Emp_name,
+          date: `${joinDate.getDate()}/${currentMonth}/${currentYear}`,
+          type: 'work anniversary',
+        });
+      }
+    });
+
+    const response = {
+      usersWithBirthday,
+      usersWithWorkAnniversary,
+    };
+
+    res.json(response);
+    // console.log('Users with birthdays and work anniversaries in the current month:', response);
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.log(e);
+  }
+});
+
+
 router.get("/user/:id", async (req, res) => {
   const employeeId = req.params.id;
   try {
@@ -236,60 +284,60 @@ router.get("/fuel/curr", async (req, res) => {
 //   }
 // });
 
-router.post("/expanse", async (req, res) => {
-  try {
-    const { money, month } = req.body;
-    const currentDate = new Date();
-    // const currentMonth = format(currentDate, "MMMM"); // Format the current month
+// router.post("/expanse", async (req, res) => {
+//   try {
+//     const { money, month } = req.body;
+//     const currentDate = new Date();
+//     // const currentMonth = format(currentDate, "MMMM"); // Format the current month
 
-    const newExpense = new Expanse({
-      month,
-      money,
-    });
+//     const newExpense = new Expanse({
+//       month,
+//       money,
+//     });
 
-    await newExpense.save();
-    res.status(201).json(newExpense);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+//     await newExpense.save();
+//     res.status(201).json(newExpense);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
 
-router.get("/expanse", async (req, res) => {
-  try {
-    const expenses = await Expanse.find();
-    res.json(expenses);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-router.get("/expanse/curr", async (req, res) => {
-  try {
-    const currentDate = new Date();
-    const currentMonth = format(currentDate, "MMMM"); // Format the current month
+// router.get("/expanse", async (req, res) => {
+//   try {
+//     const expenses = await Expanse.find();
+//     res.json(expenses);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
+// router.get("/expanse/curr", async (req, res) => {
+//   try {
+//     const currentDate = new Date();
+//     const currentMonth = format(currentDate, "MMMM"); // Format the current month
 
-    const expenses = await Expanse.find({ month: currentMonth });
+//     const expenses = await Expanse.find({ month: currentMonth });
 
-    res.json(expenses);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+//     res.json(expenses);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
 
-router.get("/expanse/prev", async (req, res) => {
-  try {
-    const currentDate = new Date();
-    const previousMonth = format(subMonths(currentDate, 1), "MMMM"); // Subtract 1 month from the current date and format it
+// router.get("/expanse/prev", async (req, res) => {
+//   try {
+//     const currentDate = new Date();
+//     const previousMonth = format(subMonths(currentDate, 1), "MMMM"); // Subtract 1 month from the current date and format it
 
-    const expenses = await Expanse.find({ month: previousMonth });
+//     const expenses = await Expanse.find({ month: previousMonth });
 
-    res.json(expenses);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+//     res.json(expenses);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
 
 module.exports = router;

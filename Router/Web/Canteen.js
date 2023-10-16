@@ -40,7 +40,7 @@ router.get("/menu", async (req, res) => {
     console.log("Get menu api call");
     const now = moment().tz("Asia/Kolkata");
     const today = now.clone().startOf("day");
-    console.log(today);
+    // console.log(today);
     const tomorrow = now.clone().add(1, "days").startOf("day");
 
     const todayMenu = await Canteen.findOne({ date: today.toDate() });

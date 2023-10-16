@@ -83,6 +83,26 @@ router.get("/location/:id", async (req, res) => {
 });
 
 
+router.get('/total-distance', async(req, res) => {
+  const locations = await Location.find({});
+  const locationData = locations.map(location => ({
+    userId: location.userRef,
+    locationInfo: location.Location_info
+  }));
+
+  let totalDistance = 0;
+  locationData.forEach(user => {
+    user.locationInfo.forEach(location => {
+      if (location.distance) {
+        totalDistance += parseFloat(location.distance);
+      }
+    });
+  });
+  
+  res.status(200).json({ totalDistance: totalDistance.toFixed(2) });
+});
+
+
 router.post("/location/:id", async (req, res) => {
   console.log("pOST CALL LOCATION")
   try {
