@@ -1,10 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Attandance = require("../../Model/Android/Attandance");
-const jwt = require("jsonwebtoken");
-const secret = "SECRET";
 const User = require("../../Model/Android/User");
-const mongoose = require("mongoose");
 
 // Both checked
 // get according to date
@@ -248,77 +245,5 @@ router.post("/attendance", async (req, res) => {
 });
 
 
-
-// router.post("/attendance", async (req, res) => {
-//   console.log("hello attendance post call");
-
-//   try {
-//     const userId = req.body.userId;
-//     const user = await User.findOne({ _id: userId });
-
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     let attendance = await Attandance.findOne({ userRef: user._id });
-
-//     if (!attendance) {
-//       attendance = new Attandance({
-//         Employee_attandance: [],
-//         userRef: user._id,
-//       });
-//     }
-
-//     const isPunchIn = req.body.isPunchIn; // Assuming you have isPunchIn in your request
-
-//     if (isPunchIn) {
-//       // Check if the user has already punched in today
-//       const lastPunchInEntry = attendance.Employee_attandance
-//         .slice()
-//         .reverse()
-//         .find((entry) => entry.action === "Punch In");
-      
-//       if (lastPunchInEntry) {
-//         // User has already punched in today
-//         return res.status(400).json({ message: "You have already punched in for today." });
-//       }
-
-//       // Handle Punch In
-//       attendance.Employee_attandance.push({
-//         action: "Punch In",
-//         Emp_status: "On Site",
-//         timer: 0, // Reset timer to 0 when Punch In
-//         timestamp: new Date(),
-//       });
-//     } else {
-//       // Handle Punch Out
-//       const lastEntry = attendance.Employee_attandance[attendance.Employee_attandance.length - 1];
-//       if (lastEntry && lastEntry.action === "Punch In") {
-        
-//         const punchInTime = lastEntry.timestamp.getTime();
-//         const punchOutTime = new Date().getTime();
-//         const timeSpent = punchOutTime - punchInTime;
-
-//         // Update the timer, Emp_status, and action for the last Punch In entry
-//         lastEntry.timer = timeSpent;
-//         lastEntry.Emp_status = "In Office";
-//         lastEntry.action = "Punch Out";
-//       } else {
-//         // Handle Punch Out without a corresponding Punch In
-//         return res.status(400).json({ message: "Punch Out without a Punch In entry." });
-//       }
-//     }
-
-//     await attendance.save();
-
-//     res.status(200).json({
-//       status: "Success",
-//       message: "Attendance updated successfully",
-//     });
-//   } catch (e) {
-//     res.status(400).json({ message: e.message });
-//     console.log(e);
-//   }
-// });
 
 module.exports = router;

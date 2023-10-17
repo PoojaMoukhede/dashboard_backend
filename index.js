@@ -6,6 +6,7 @@ const route = require("./Router/Web/Admin");
 const e_route = require("./Router/Web/AddEmployee");
 const m_route = require("./Router/Web/Manager");
 const event_route = require("./Router/Web/Event");
+const Leave_route = require('./Router/Android/Leave')
 // const sendEmail = require('./utils/sendMail')
 const canteen_route = require("./Router/Web/Canteen");
 const nodemailer = require("nodemailer");
@@ -36,8 +37,10 @@ mongoose
   });
 
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true}));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit:1024*1024*20, type:'application/json'}));
+app.use(bodyParser.urlencoded({extended:true,limit:1024*1024*20,type:'application/x-www-form-urlencoding' }));
+// app.use(bodyParser.urlencoded({ extended: true}));
+// app.use(bodyParser.json());
 app.use(express.urlencoded({limit: '50mb'}));
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -55,6 +58,7 @@ app.use("/", Clearance_form);
 app.use("/", Attandance);
 app.use("/", Location);
 app.use("/", Complaint);
+app.use('/', Leave_route);
 // app.use('/', LatLong);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get("/", function (req, res) {

@@ -109,13 +109,17 @@ router.post("/form", upload.single("image"), async (req, res) => {
     const image = req.file;
     const imageName = req.body.ImageName;
     const transportType = req.body.Transport_type;
-    const totalExpense = req.body.Total_expense;
+    const Food = parseFloat(req.body.Food) || 0;
+    const Hotel = parseFloat(req.body.Hotel) || 0;
+    const Water = parseFloat(req.body.Water) || 0;
+    const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
 
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    let fuelInLiters = 0; 
+    const totalExpense = Food + Hotel + Water + Other_Transport;
+    let fuelInLiters = 0;
 
     if (transportType === "Car" || transportType === "Bike") {
       fuelInLiters = totalExpense;
@@ -126,8 +130,12 @@ router.post("/form", upload.single("image"), async (req, res) => {
     if (clearance_data) {
       clearance_data.FormData.push({
         Transport_type: transportType,
+        Food: Food,
+        Water: Water,
+        Hotel: Hotel,
+        Other_Transport: Other_Transport,
         Total_expense: totalExpense,
-        Fuel_in_liters: fuelInLiters, 
+        Fuel_in_liters: fuelInLiters,
         images: {
           data: image.buffer,
           contentType: image.mimetype,
@@ -141,8 +149,12 @@ router.post("/form", upload.single("image"), async (req, res) => {
         FormData: [
           {
             Transport_type: transportType,
+            Food: Food,
+            Water: Water,
+            Hotel: Hotel,
+            Other_Transport: Other_Transport,
             Total_expense: totalExpense,
-            Fuel_in_liters: fuelInLiters, 
+            Fuel_in_liters: fuelInLiters,
             images: {
               data: image.buffer,
               contentType: image.mimetype,
@@ -258,6 +270,125 @@ router.get('/totalMonthlyExpenses', async (req, res) => {
     console.error(e);
   }
 });
+
+
+// total fuel 
+router.get("/totalFuel", async (req, res) => {
+  console.log("hello total fuel call");
+  try {
+    const users = await User.find();
+    let totalAllFuel = 0;
+
+    for (const user of users) {
+      const Record = await Clearance.findOne({ userRef: user._id });
+
+      if (Record) {
+        Record.FormData.forEach((formData) => {
+          if (formData.Fuel_in_liters) {
+            totalAllFuel += parseFloat(formData.Fuel_in_liters);
+          }
+        });
+      }
+    }
+
+    res.status(200).json({
+      status: "Success",
+      totalAllFuel: totalAllFuel,
+    });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.log(e);
+  }
+});
+
+router.get('/totalFuelByMonth', async (req, res) => {
+  try {
+    const users = await User.find();
+    const totalFuelByMonth = {};
+
+    for (const user of users) {
+      const Record = await Clearance.findOne({ userRef: user._id });
+
+      if (Record) {
+        Record.FormData.forEach((formData) => {
+          if (formData.Fuel_in_liters && formData.timestamp) {
+            const date = new Date(formData.timestamp);
+            const formattedMonth = format(date, 'MMMM'); 
+
+            if (!totalFuelByMonth[formattedMonth]) {
+              totalFuelByMonth[formattedMonth] = 0;
+            }
+            totalFuelByMonth[formattedMonth] += parseFloat(formData.Fuel_in_liters);
+          }
+        });
+      }
+    }
+
+    const monthlyExpenses = Object.keys(totalFuelByMonth).map(month => ({
+      month,
+      expenses: totalFuelByMonth[month],
+    }));
+
+    res.status(200).json(monthlyExpenses);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+    console.error(e);
+  }
+});
+
+
+
+router.get('/current-month-totals', async (req, res) => {
+  try {
+    const totals = await calculateCurrentMonthTotals();
+    console.log(`totals : ${totals}`)
+    res.json(totals);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+const calculateCurrentMonthTotals = async () => {
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1; // Months are 0-indexed, so add 1
+
+  // Query documents with a timestamp within the current month and year
+  const currentMonthClearances = await Clearance.find({
+    "FormData.timestamp": {
+      $gte: new Date(currentYear, currentMonth - 1, 1), // Start of current month
+      $lt: new Date(currentYear, currentMonth, 1), // Start of next month
+    },
+  });
+
+  // Calculate totals for each field
+  const totals = {
+    Transport_type: {},
+    Total_expense: 0,
+    Fuel_in_liters: 0,
+    Food: 0,
+    Water: 0,
+    Hotel: 0,
+    Other_Transport: 0,
+  };
+
+  currentMonthClearances.forEach((clearance) => {
+    clearance.FormData.forEach((formData) => {
+      totals.Transport_type[formData.Transport_type] =
+        (totals.Transport_type[formData.Transport_type] || 0) + 1;
+      totals.Total_expense += parseFloat(formData.Total_expense) || 0;
+      totals.Fuel_in_liters += parseFloat(formData.Fuel_in_liters) || 0;
+      totals.Food += parseFloat(formData.Food) || 0;
+      totals.Water += parseFloat(formData.Water) || 0;
+      totals.Hotel += parseFloat(formData.Hotel) || 0;
+      totals.Other_Transport += parseFloat(formData.Other_Transport) || 0;
+    });
+  });
+
+  return totals;
+};
+
 
 
 

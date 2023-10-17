@@ -102,7 +102,8 @@ router.post("/menu/buy", async (req, res) => {
       // Check if there's a record for the parsed purchase date and menuRef
       const existingPurchase = couponPurchase.Coupon_Count.find(
         (purchase) =>
-          purchase.purchaseDate === parsedPurchaseDate && purchase.menuRef.equals(menuRef)
+          purchase.purchaseDate === parsedPurchaseDate &&
+          purchase.menuRef.equals(menuRef)
       );
 
       if (existingPurchase) {
@@ -118,7 +119,9 @@ router.post("/menu/buy", async (req, res) => {
       await couponPurchase.save();
     } else {
       couponPurchase = new Coupon({
-        Coupon_Count: [{ purchaseDate: parsedPurchaseDate, numberOfCoupons, menuRef }],
+        Coupon_Count: [
+          { purchaseDate: parsedPurchaseDate, numberOfCoupons, menuRef },
+        ],
         userRef: user._id,
       });
       await couponPurchase.save();
@@ -133,8 +136,6 @@ router.post("/menu/buy", async (req, res) => {
     console.log(e);
   }
 });
-
-
 
 router.put("/menu/:date", async (req, res) => {
   try {
@@ -156,28 +157,62 @@ router.put("/menu/:date", async (req, res) => {
   }
 });
 
-
-
-router.get('/coupon-count-by-menu', async (req, res) => {
+router.get("/coupon-count-by-menu", async (req, res) => {
   try {
     const couponCountsByMenu = await Coupon.aggregate([
       {
-        $unwind: "$Coupon_Count"
+        $unwind: "$Coupon_Count",
       },
       {
         $group: {
           _id: "$Coupon_Count.menuRef",
-          totalCoupons: { $sum: "$Coupon_Count.numberOfCoupons"}
-        }
-      }
+          totalCoupons: { $sum: "$Coupon_Count.numberOfCoupons" },
+        },
+      },
     ]);
-
+    console.log(`count coupon ${couponCountsByMenu.totalCoupons}`);
     res.json(couponCountsByMenu);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// router.get("/coupon-count-by-menu", async (req, res) => {
+//   try {
+//     const coupons = await Coupon.find(); // Assuming your model is named "Coupon"
+    
+//     // Create an object to store coupon counts by menu
+//     const couponCountsByMenu = {};
+
+//     // Loop through the coupons and count them by menu
+//     coupons.forEach(coupon => {
+//       if (coupon.Coupon_Count) {
+//         coupon.Coupon_Count.forEach(couponCount => {
+//           const menuRef = couponCount.menuRef;
+//           const numberOfCoupons = couponCount.numberOfCoupons;
+          
+//           if (!couponCountsByMenu[menuRef]) {
+//             couponCountsByMenu[menuRef] = 0;
+//           }
+//           couponCountsByMenu[menuRef] += numberOfCoupons;
+//         });
+//       }
+//     });
+
+//     // Convert the object into an array of objects
+//     const result = Object.keys(couponCountsByMenu).map(menuRef => ({
+//       menuRef,
+//       totalCoupons: couponCountsByMenu[menuRef],
+//     }));
+    
+//     console.log("Coupon count by menu:", result);
+//     res.json(result);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
 
 
 module.exports = router;
