@@ -214,5 +214,39 @@ router.get("/coupon-count-by-menu", async (req, res) => {
 //   }
 // });
 
+ async function getCouponSumByUserId(userId) {
+  try {
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return 0; // Return 0 if the user is not found
+    }
+
+    const userCoupons = await Coupon.findOne({ userRef: user._id });
+
+    let totalCoupons = 0;
+
+    userCoupons.Coupon_Count.forEach((count) => {
+      totalCoupons += count.numberOfCoupons;
+    });
+
+    return totalCoupons;
+  } catch (error) {
+    throw error;
+  }
+}
+
+router.get("/coupon/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const sum = await getCouponSumByUserId(userId);
+
+    res.json({ totalCoupons: sum });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to retrieve coupon sum" });
+  }
+});
+
 
 module.exports = router;

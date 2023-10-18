@@ -1,14 +1,19 @@
 const mongoose = require('mongoose');
 
 const leaveSchema = new mongoose.Schema({
+  Leave_info:[
+    {
+      startDate: Date,
+      endDate: Date,
+      status: String, // 'pending', 'approved', 'rejected'
+      numberOfDays: Number
+    }
+  ],
   userRef: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
-  startDate: Date,
-  endDate: Date,
-  status: String, // 'pending', 'approved', 'rejected'
-  numberOfDays: Number
+ 
 });
 
 const Leave = mongoose.model('Leave', leaveSchema);
