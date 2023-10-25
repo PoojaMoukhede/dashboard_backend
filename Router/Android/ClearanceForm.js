@@ -2,8 +2,6 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const Clearance = require("../../Model/Android/ClearanceForm");
-const jwt = require("jsonwebtoken");
-const secret = "SECRET";
 const format = require('date-fns/format');
 const User = require("../../Model/Android/User");
 const fileUpload = require('express-fileupload');
@@ -19,17 +17,9 @@ app.use(
 
 // Add this line to serve our index.html page
 app.use(express.static('public'));
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-      cb(null, './uploads');
-    },
-  filename: function (req, file, cb) {
-      cb(null, file.originalname);
-  }
-});
 
-// const storage = multer.memoryStorage();
-// const upload = multer({ storage: storage });
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 const uploadImg = multer({storage: storage}).single('image');
 
 // Both Checked
@@ -117,7 +107,6 @@ router.get("/form", async (req, res) => {
 
 
 // here i am sending fuel conditional based
-
 router.post("/form",uploadImg, async (req, res) => {
   console.log("Hello form post call");
   try {
@@ -128,7 +117,7 @@ router.post("/form",uploadImg, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const image = req.file.path;
+    const image = req.file;
     const imageName = req.body.ImageName;
     const transportType = req.body.Transport_type;
     const Food = parseFloat(req.body.Food) || 0;
@@ -200,7 +189,6 @@ router.post("/form",uploadImg, async (req, res) => {
   }
 });
 
-
 router.get("/form/:id", async (req, res) => {
   console.log("hello form get ID call");
   try {
@@ -257,7 +245,6 @@ router.get("/totalExpenses", async (req, res) => {
   }
 });
 
-
 router.get('/totalMonthlyExpenses', async (req, res) => {
   try {
     const users = await User.find();
@@ -292,7 +279,6 @@ router.get('/totalMonthlyExpenses', async (req, res) => {
     console.error(e);
   }
 });
-
 
 // total fuel 
 router.get("/totalFuel", async (req, res) => {
@@ -358,12 +344,10 @@ router.get('/totalFuelByMonth', async (req, res) => {
   }
 });
 
-
-
 router.get('/current-month-totals', async (req, res) => {
   try {
     const totals = await calculateCurrentMonthTotals();
-    console.log(`totals : ${totals}`)
+    // console.log(`totals : ${totals}`)
     res.json(totals);
   } catch (error) {
     console.error(error);
@@ -506,8 +490,6 @@ router.post('/upload/:id', async (req, res) => {
     console.log(e);
   }
 });
-
-
 
 
 module.exports = router;

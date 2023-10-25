@@ -85,32 +85,26 @@ cron.schedule("0 0 * * *", async () => {
 // coupon purchesed count and post, update, delete
 router.post("/menu/buy", async (req, res) => {
   console.log("Hello Menu Buy POST call");
-
   try {
-    const { userId, numberOfCoupons, purchaseDate, menuRef } = req.body;
+    const { userId, numberOfCoupons, menuRef } = req.body;
     const user = await User.findOne({ _id: userId });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const parsedPurchaseDate = new Date(purchaseDate);
-    console.log(`parsedPurchaseDate : ${parsedPurchaseDate}`);
     let couponPurchase = await Coupon.findOne({ userRef: user._id });
 
     if (couponPurchase) {
-      // Check if there's a record for the parsed purchase date and menuRef
+      // Check if there's a record for the default purchase date and menuRef
       const existingPurchase = couponPurchase.Coupon_Count.find(
-        (purchase) =>
-          purchase.purchaseDate === parsedPurchaseDate &&
-          purchase.menuRef.equals(menuRef)
+        (purchase) => purchase.menuRef.equals(menuRef)
       );
 
       if (existingPurchase) {
         existingPurchase.numberOfCoupons += numberOfCoupons;
       } else {
         couponPurchase.Coupon_Count.push({
-          purchaseDate: parsedPurchaseDate,
           numberOfCoupons,
           menuRef,
         });
@@ -120,7 +114,7 @@ router.post("/menu/buy", async (req, res) => {
     } else {
       couponPurchase = new Coupon({
         Coupon_Count: [
-          { purchaseDate: parsedPurchaseDate, numberOfCoupons, menuRef },
+          { numberOfCoupons, menuRef },
         ],
         userRef: user._id,
       });
@@ -129,7 +123,7 @@ router.post("/menu/buy", async (req, res) => {
 
     res.status(200).json({
       status: "Success",
-      message: `${numberOfCoupons} menu items purchased successfully for ${parsedPurchaseDate}`,
+      message: `${numberOfCoupons} menu items purchased successfully for the default purchase date`,
     });
   } catch (e) {
     res.status(400).json({ message: e.message });
