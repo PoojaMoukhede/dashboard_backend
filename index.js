@@ -18,6 +18,7 @@ const Attandance = require("./Router/Android/Attandance");
 const Location = require("./Router/Android/Location");
 const Complaint = require("./Router/Android/Complaint");
 // const LatLong = require('./Router/Android/LatLong')
+const uploadMiddleware = require("./Middleware/Uploads") ;
 
 const cors = require("cors");
 app.use(cors());
@@ -192,6 +193,27 @@ app.post("/send_recovery_email", (req, res) => {
 //   console.log("Message sent: %s", info.messageId);
 
 // }
+
+const fs = require('fs');
+app.post('/upload', uploadMiddleware, (req, res) => {
+ try{
+
+  const files = req.files;
+  files.forEach((file) => {
+    const filePath = `ooploads/${file.filename}`;
+    fs.rename(file.path, filePath, (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to store the file' });
+      }
+    });
+  });
+
+  res.status(200).json({ message: 'File upload successful' });
+ }catch(e){
+  res.status(400).json({ message: e.message });
+    console.log(e);
+ }
+});
 
 app.listen(port, () => {
   console.log(`server is up on port ${port}`);

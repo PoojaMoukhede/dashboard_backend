@@ -264,6 +264,15 @@ router.post("/attendance", async (req, res) => {
         });
 
         if (missedPunchIn) {
+          if (today.getDay() === 0) {
+            // It's a Sunday, set the status as "Sunday" with the date
+            attendance.Employee_attandance.push({
+              action: "Sunday",
+              Emp_status: "Sunday",
+              timer: 0,
+              timestamp: today,
+            });
+          }
           // Check if today is not a Sunday === 0 , & deduct leave for missed punch
           if (today.getDay() !== 0) {
             const leaveBalance = await LeaveBalance.findOne({
@@ -276,6 +285,7 @@ router.post("/attendance", async (req, res) => {
 
               await leaveBalance.save();
             }
+            console.log(`leave balance : ${leaveBalance}`)
           }
 
           // Update the missed punch entry
@@ -298,6 +308,14 @@ router.post("/attendance", async (req, res) => {
             leaveBalance.availableLeave -= daysToDeduct;
             await leaveBalance.save();
           }
+          attendance.Employee_attandance.push({
+            action: 'On Leave',
+            Emp_status: 'On Leave',
+            timer: 0,
+            timestamp: today,
+          });
+      
+          await attendance.save();
         }
       }
     }
@@ -325,5 +343,34 @@ router.post("/attendance", async (req, res) => {
     console.log(e);
   }
 });
+
+
+router.get('/leave-balance/:id', async(req, res) => {
+  try {
+    const userId = req.params.id;
+    // console.log(userId);
+
+    const user = await User.findOne({ _id: userId });
+    // console.log(`user : ${user}`);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const leave = await LeaveBalance.findOne({ userRef: user._id });
+    console.log(`Employee LeaveBalance : ${leave}`);
+
+    if (!leave) {
+      return res.status(404).json({ message: "leave record not found" });
+    }
+    res.status(200).json({
+      status: "Success",
+      message: leave,
+    });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.log(e);
+  }
+});
+
 
 module.exports = router;

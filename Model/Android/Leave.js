@@ -5,8 +5,8 @@ const leaveSchema = new mongoose.Schema({
     {
       startDate: Date,
       endDate: Date,
-      status: String, // 'pending', 'approved', 'rejected'
-      numberOfDays: Number
+      status: {type : String, default :"Pending"}, // 'pending', 'approved', 'rejected'
+      numberOfDays: Number,
     }
   ],
   userRef: {

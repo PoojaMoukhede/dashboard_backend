@@ -20,7 +20,9 @@ app.use(express.static('public'));
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-const uploadImg = multer({storage: storage}).single('image');
+// const uploadImg = multer({storage: storage}).single('image');
+const uploadImg = multer({storage: storage}).array('files');
+const uploadMiddleware = require("../../Middleware/Uploads")
 
 // Both Checked
 // GET all clearances
@@ -43,31 +45,47 @@ router.get("/form", async (req, res) => {
   }
 });
 
-// working 
-// router.post("/form", upload.single("image"), async (req, res) => {
+// here i am sending fuel conditional based
+// router.post("/form",uploadImg, async (req, res) => {
 //   console.log("Hello form post call");
 //   try {
 //     const userId = req.body.userId;
-//     // console.log(`user ------ ${userId}`)
 //     const user = await User.findOne({ _id: userId });
-//     // console.log(`user ------ ${user}`)
+
 //     if (!user) {
 //       return res.status(404).json({ message: "User not found" });
 //     }
 
 //     const image = req.file;
 //     const imageName = req.body.ImageName;
+//     const transportType = req.body.Transport_type;
+//     const Food = parseFloat(req.body.Food) || 0;
+//     const Hotel = parseFloat(req.body.Hotel) || 0;
+//     const Water = parseFloat(req.body.Water) || 0;
+//     const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
 
 //     if (!req.file) {
 //       return res.status(400).json({ message: "No file uploaded" });
+//     }
+
+//     const totalExpense = Food + Hotel + Water + Other_Transport;
+//     let fuelInLiters = 0;
+
+//     if (transportType === "Car" || transportType === "Bike") {
+//       fuelInLiters = totalExpense;
 //     }
 
 //     let clearance_data = await Clearance.findOne({ userRef: user._id });
 
 //     if (clearance_data) {
 //       clearance_data.FormData.push({
-//         Transport_type: req.body.Transport_type,
-//         Total_expense: req.body.Total_expense,
+//         Transport_type: transportType,
+//         Food: Food,
+//         Water: Water,
+//         Hotel: Hotel,
+//         Other_Transport: Other_Transport,
+//         Total_expense: totalExpense,
+//         Fuel_in_liters: fuelInLiters,
 //         images: {
 //           data: image.buffer,
 //           contentType: image.mimetype,
@@ -80,8 +98,13 @@ router.get("/form", async (req, res) => {
 //       clearance_data = new Clearance({
 //         FormData: [
 //           {
-//             Transport_type: req.body.Transport_type,
-//             Total_expense: req.body.Total_expense,
+//             Transport_type: transportType,
+//             Food: Food,
+//             Water: Water,
+//             Hotel: Hotel,
+//             Other_Transport: Other_Transport,
+//             Total_expense: totalExpense,
+//             Fuel_in_liters: fuelInLiters,
 //             images: {
 //               data: image.buffer,
 //               contentType: image.mimetype,
@@ -104,90 +127,6 @@ router.get("/form", async (req, res) => {
 //     console.log(e);
 //   }
 // });
-
-
-// here i am sending fuel conditional based
-router.post("/form",uploadImg, async (req, res) => {
-  console.log("Hello form post call");
-  try {
-    const userId = req.body.userId;
-    const user = await User.findOne({ _id: userId });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const image = req.file;
-    const imageName = req.body.ImageName;
-    const transportType = req.body.Transport_type;
-    const Food = parseFloat(req.body.Food) || 0;
-    const Hotel = parseFloat(req.body.Hotel) || 0;
-    const Water = parseFloat(req.body.Water) || 0;
-    const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
-
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
-
-    const totalExpense = Food + Hotel + Water + Other_Transport;
-    let fuelInLiters = 0;
-
-    if (transportType === "Car" || transportType === "Bike") {
-      fuelInLiters = totalExpense;
-    }
-
-    let clearance_data = await Clearance.findOne({ userRef: user._id });
-
-    if (clearance_data) {
-      clearance_data.FormData.push({
-        Transport_type: transportType,
-        Food: Food,
-        Water: Water,
-        Hotel: Hotel,
-        Other_Transport: Other_Transport,
-        Total_expense: totalExpense,
-        Fuel_in_liters: fuelInLiters,
-        images: {
-          data: image.buffer,
-          contentType: image.mimetype,
-        },
-        ImageName: imageName,
-        timestamp: new Date(),
-      });
-      await clearance_data.save();
-    } else {
-      clearance_data = new Clearance({
-        FormData: [
-          {
-            Transport_type: transportType,
-            Food: Food,
-            Water: Water,
-            Hotel: Hotel,
-            Other_Transport: Other_Transport,
-            Total_expense: totalExpense,
-            Fuel_in_liters: fuelInLiters,
-            images: {
-              data: image.buffer,
-              contentType: image.mimetype,
-            },
-            ImageName: imageName,
-            timestamp: new Date(),
-          },
-        ],
-        userRef: user._id,
-      });
-      await clearance_data.save();
-    }
-
-    res.status(200).json({
-      status: "Success",
-      message: "Clearance form added successfully",
-    });
-  } catch (e) {
-    res.status(400).json({ message: e.message });
-    console.log(e);
-  }
-});
 
 router.get("/form/:id", async (req, res) => {
   console.log("hello form get ID call");
@@ -395,47 +334,33 @@ const calculateCurrentMonthTotals = async () => {
   return totals;
 };
 
-router.post('/upload/:id', async (req, res) => {
+router.post("/form",uploadMiddleware, async (req, res) => {
+  console.log("Hello form post call");
   try {
-    const userId = req.params.id;
-    console.log(userId)
+    const userId = req.body.userId;
     const user = await User.findOne({ _id: userId });
-    console.log(user)
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Use req.files instead of req.file, and check for image existence
-    const {image}  = req.file;
-    if (!image) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
-
-    if (!/^image/.test(image.mimetype)) {
-      return res.status(400).json({ message: "Invalid file type" });
-    }
-
-    // Move the image to the 'upload' directory (create the directory if it doesn't exist)
-    const uploadPath = __dirname + '/upload/';
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    // const imageName = req.body.ImageName;
-    const imageName = imageName + path.extname(image.name);
-    image.mv(path.join(uploadPath, imageName));
-
+    const files = req.files;
+    const imageName = req.body.ImageName;
     const transportType = req.body.Transport_type;
     const Food = parseFloat(req.body.Food) || 0;
     const Hotel = parseFloat(req.body.Hotel) || 0;
     const Water = parseFloat(req.body.Water) || 0;
     const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
 
+    if (!req.files) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
     const totalExpense = Food + Hotel + Water + Other_Transport;
     let fuelInLiters = 0;
 
     if (transportType === "Car" || transportType === "Bike") {
-      fuelInLiters = totalExpense;
+      fuelInLiters = req.body.Fuel_in_liters;
     }
 
     let clearance_data = await Clearance.findOne({ userRef: user._id });
@@ -450,8 +375,8 @@ router.post('/upload/:id', async (req, res) => {
         Total_expense: totalExpense,
         Fuel_in_liters: fuelInLiters,
         images: {
-          data: fs.readFileSync(path.join(uploadPath, imageName)), // Read the image file
-          contentType: image.mimetype,
+          data: files.buffer,
+          contentType: files.mimetype,
         },
         ImageName: imageName,
         timestamp: new Date(),
@@ -469,8 +394,8 @@ router.post('/upload/:id', async (req, res) => {
             Total_expense: totalExpense,
             Fuel_in_liters: fuelInLiters,
             images: {
-              data: fs.readFileSync(path.join(uploadPath, imageName)), // Read the image file
-              contentType: image.mimetype,
+              data: files.buffer,
+              contentType: files.mimetype,
             },
             ImageName: imageName,
             timestamp: new Date(),
