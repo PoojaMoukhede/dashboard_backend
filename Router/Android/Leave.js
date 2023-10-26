@@ -116,8 +116,6 @@ router.put("/leave/:id", async (req, res) => {
   }
 });
 
-
-
 // Employee and Admin can view all leave requests (GET request)
 router.get("/leave", async (req, res) => {
   try {

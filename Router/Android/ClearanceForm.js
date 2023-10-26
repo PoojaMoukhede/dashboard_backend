@@ -271,12 +271,12 @@ router.get('/totalFuelByMonth', async (req, res) => {
       }
     }
 
-    const monthlyExpenses = Object.keys(totalFuelByMonth).map(month => ({
+    const monthlyExpensesOnFuel = Object.keys(totalFuelByMonth).map(month => ({
       month,
-      expenses: totalFuelByMonth[month],
+      liters: totalFuelByMonth[month],
     }));
 
-    res.status(200).json(monthlyExpenses);
+    res.status(200).json(monthlyExpensesOnFuel);
   } catch (e) {
     res.status(500).json({ message: e.message });
     console.error(e);
