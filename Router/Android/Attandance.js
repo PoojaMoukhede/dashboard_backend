@@ -257,46 +257,46 @@ router.post("/attendance", async (req, res) => {
         // Check if the user missed a Punch In
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const missedPunchIn = await Attandance.findOne({
-          userRef: user._id,
-          "Employee_attandance.action": "Punch In",
-          "Employee_attandance.timestamp": { $lt: today },
-        });
+        // const missedPunchIn = await Attandance.findOne({
+        //   userRef: user._id,
+        //   "Employee_attandance.action": "Punch In",
+        //   "Employee_attandance.timestamp": { $lt: today },
+        // });
 
-        if (missedPunchIn) {
-          if (today.getDay() === 0) {
-            // It's a Sunday, set the status as "Sunday" with the date
-            attendance.Employee_attandance.push({
-              action: "Sunday",
-              Emp_status: "Sunday",
-              timer: 0,
-              timestamp: today,
-            });
-          }
-          // Check if today is not a Sunday === 0 , & deduct leave for missed punch
-          if (today.getDay() !== 0) {
-            const leaveBalance = await LeaveBalance.findOne({
-              userRef: user._id,
-            });
-            if (leaveBalance) {
-              // Deduct a certain amount of leave
-              const daysToDeduct = 1;
-              leaveBalance.availableLeave -= daysToDeduct;
+        // if (missedPunchIn) {
+        //   if (today.getDay() === 0) {
+        //     // It's a Sunday, set the status as "Sunday" with the date
+        //     attendance.Employee_attandance.push({
+        //       action: "Sunday",
+        //       Emp_status: "Sunday",
+        //       timer: 0,
+        //       timestamp: today,
+        //     });
+        //   }
+        //   // Check if today is not a Sunday === 0 , & deduct leave for missed punch
+        //   if (today.getDay() !== 0) {
+        //     const leaveBalance = await LeaveBalance.findOne({
+        //       userRef: user._id,
+        //     });
+        //     if (leaveBalance) {
+        //       // Deduct a certain amount of leave
+        //       const daysToDeduct = 1;
+        //       leaveBalance.availableLeave -= daysToDeduct;
 
-              await leaveBalance.save();
-            }
-            console.log(`leave balance : ${leaveBalance}`)
-          }
+        //       await leaveBalance.save();
+        //     }
+        //     console.log(`leave balance : ${leaveBalance}`)
+        //   }
 
-          // Update the missed punch entry
-          missedPunchIn.Employee_attandance.push({
-            action: "Misspunch Out",
-            Emp_status: "Misspunch Out",
-            timer: 0,
-            timestamp: new Date(),
-          });
-          await missedPunchIn.save();
-        }
+        //   // Update the missed punch entry
+        //   missedPunchIn.Employee_attandance.push({
+        //     action: "Misspunch Out",
+        //     Emp_status: "Misspunch Out",
+        //     timer: 0,
+        //     timestamp: new Date(),
+        //   });
+        //   await missedPunchIn.save();
+        // }
       } else {
         // Check if today is not a Sunday & deduct leave for not punching in
         if (today.getDay() !== 0) {
