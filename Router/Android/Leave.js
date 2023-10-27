@@ -119,6 +119,7 @@ router.put("/leave/:id", async (req, res) => {
 // Employee and Admin can view all leave requests (GET request)
 router.get("/leave", async (req, res) => {
   try {
+    console.log("leave call")
     const leaveApplications = await Leave.find({}).populate("userRef");
 
     res.json(leaveApplications);
@@ -129,7 +130,9 @@ router.get("/leave", async (req, res) => {
 });
 
 router.get("/leave/:id", async (req, res) => {
+
   try {
+    console.log("leave by id call")
     const userId = req.params.id;
     const user = await User.findOne({ _id: userId });
 

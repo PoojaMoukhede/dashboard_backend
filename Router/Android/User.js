@@ -20,6 +20,31 @@ router.post(
   body("password"),
   body("confirm_password"),
   body("email").isEmail(),
+  body('Emp_contact_No')
+    .matches(/^\d{10}$/) 
+    .withMessage('Phone number must be a 10-digit numeric value'),
+  body('Emp_DOB')
+    .isISO8601()
+    .custom((value, { req }) => {
+      // Validate that the Date of Birth is not in the future
+      const dob = new Date(value);
+      const today = new Date();
+      if (dob > today) {
+        throw new Error('Date of Birth cannot be in the future');
+      }
+      return true;
+    }),
+   body('Emp_joining_date')
+    .isISO8601()
+    .custom((value, { req }) => {
+      // Validate that the Date of Joining is not in the future
+      const joiningDate = new Date(value);
+      const today = new Date();
+      if (joiningDate > today) {
+        throw new Error('Date of Joining cannot be in the future');
+      }
+      return true;
+    }),
   async (req, res) => {
     // User.init()
     console.log("hello register");
@@ -41,7 +66,7 @@ router.post(
           bcrypt.hash(req.body.password, salt, async (err, hash) => {
             const user = await User.create({
               Emp_ID: req.body.Emp_ID,
-              Emp_Emp_name: req.body.Emp_Emp_name,
+              Emp_name: req.body.Emp_name,
               email: req.body.email,
               Emp_contact_No: req.body.Emp_contact_No,
               Emp_department: req.body.Emp_department,

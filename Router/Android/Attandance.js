@@ -96,96 +96,6 @@ router.put("/attendance/:id", async (req, res) => {
   }
 });
 
-// without miss punch logic
-// router.post("/attendance", async (req, res) => {
-//   console.log("hello attendance post call");
-
-//   try {
-//     const userId = req.body.userId;
-//     const user = await User.findOne({ _id: userId });
-
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     let attendance = await Attandance.findOne({ userRef: user._id });
-
-//     if (!attendance) {
-//       attendance = new Attandance({
-//         Employee_attandance: [],
-//         userRef: user._id,
-//       });
-//     }
-
-//     const isPunchIn = req.body.isPunchIn;
-//     // const timer = req.body.timer; // Assuming you have timer in your request
-
-//     let totalWorkedHours = 0; // Initialize totalWorkedHours to 0
-
-//     if (isPunchIn) {
-//       // Check if the user has already punched in today
-//       const lastPunchInEntry = attendance.Employee_attandance
-//         .slice()
-//         .reverse()
-//         .find((entry) => entry.action === "Punch In");
-
-//       if (lastPunchInEntry) {
-//         // User has already punched in today
-//         return res.status(400).json({ message: "You have already punched in for today." });
-//       }
-
-//       // Handle Punch In
-//       attendance.Employee_attandance.push({
-//         action: "Punch In",
-//         Emp_status: "On Site",
-//         timer: 0, // Reset timer to 0 when Punch In
-//         timestamp: new Date(),
-//       });
-//     } else {
-//       // Handle Punch Out
-//       const lastEntry = attendance.Employee_attandance[attendance.Employee_attandance.length - 1];
-//       if (lastEntry && lastEntry.action === "Punch In") {
-//         const punchInTime = lastEntry.timestamp.getTime();
-//         const punchOutTime = new Date().getTime();
-//         const timeSpent = punchOutTime - punchInTime;
-
-//         // Calculate total worked hours
-//         totalWorkedHours = timeSpent / (60 * 60 * 1000);
-
-//         // Update the timer, Emp_status, and action for the last Punch In entry
-//         lastEntry.timer = timeSpent;
-//         lastEntry.Emp_status = "In Office";
-//         lastEntry.action = "Punch Out";
-//       } else {
-//         // Handle Punch Out without a corresponding Punch In
-//         return res.status(400).json({ message: "Punch Out without a Punch In entry." });
-//       }
-//     }
-
-//     // Calculate overtime and below-time based on total worked hours
-//     let overtimeHours = 0;
-//     let belowTimeHours = 0;
-
-//     if (totalWorkedHours > 9) {
-//       overtimeHours = Math.floor(totalWorkedHours - 9);
-//     } else if (totalWorkedHours < 9) {
-//       belowTimeHours = Math.floor(9 - totalWorkedHours);
-//     }
-
-//     await attendance.save();
-
-//     res.status(200).json({
-//       status: "Success",
-//       message: "Attendance updated successfully",
-//       overtimeHours: overtimeHours,
-//       belowTimeHours: belowTimeHours,
-//     });
-//   } catch (e) {
-//     res.status(400).json({ message: e.message });
-//     console.log(e);
-//   }
-// });
-
 router.post("/attendance", async (req, res) => {
   console.log("Hello attendance post call");
 
@@ -309,12 +219,12 @@ router.post("/attendance", async (req, res) => {
             await leaveBalance.save();
           }
           attendance.Employee_attandance.push({
-            action: 'On Leave',
-            Emp_status: 'On Leave',
+            action: "On Leave",
+            Emp_status: "On Leave",
             timer: 0,
             timestamp: today,
           });
-      
+
           await attendance.save();
         }
       }
@@ -344,8 +254,7 @@ router.post("/attendance", async (req, res) => {
   }
 });
 
-
-router.get('/leave-balance/:id', async(req, res) => {
+router.get("/leave-balance/:id", async (req, res) => {
   try {
     const userId = req.params.id;
     // console.log(userId);
@@ -372,5 +281,62 @@ router.get('/leave-balance/:id', async(req, res) => {
   }
 });
 
+//department wise attandance
+router.get('/departmentWise', async (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  console.log(`today : ${today}`);
+
+  const department = 'Software';
+
+  try {
+    const results = await Attandance.find({
+      'Employee_attandance.timestamp': {
+        $gte: new Date(today), // Start of the day
+      }
+    })
+    .populate('userRef')
+    .exec();
+
+    // Filter the results by department
+    const filteredResults = results.filter(result => result.userRef.Emp_department === department);
+    console.log(filteredResults);
+
+    res.json(filteredResults); // Send the filtered results as JSON response
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// router.get("/departmentWise", async (req, res) => {
+//   const today = new Date().toISOString().slice(0, 10); // Get today's date in ISO format (YYYY-MM-DD)
+//   console.log(`today : ${today}`);
+//   const department = "Software";
+
+//   try {
+//     const results = await Attandance.find({
+//       "Employee_attandance.timestamp": {
+//         $gte: new Date(today),
+//       }, // Today's date
+//     })
+//       .populate("userRef")
+//       .exec();
+
+//     // Filter the results by department
+//     const filteredResults = results.filter(
+//       (result) => result.userRef.Emp_department === department
+//     );
+//     console.log(filteredResults);
+
+//     if (filteredResults.length > 0) {
+//       res.json(filteredResults[0]); // Send the first matched document as JSON response
+//     } else {
+//       res.json({ message: "No matching record for today" });
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
 
 module.exports = router;
