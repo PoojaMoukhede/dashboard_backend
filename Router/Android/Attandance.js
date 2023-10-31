@@ -306,7 +306,7 @@ router.get('/departmentWise', async (req, res) => {
     console.error(err);
     res.status(500).send('Internal Server Error');
   }
-});
+}); 
 
 // router.get("/departmentWise", async (req, res) => {
 //   const today = new Date().toISOString().slice(0, 10); // Get today's date in ISO format (YYYY-MM-DD)

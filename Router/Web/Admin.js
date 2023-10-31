@@ -18,6 +18,9 @@ router.post(
   body("password"),
   body("confirm_password"),
   body("email").isEmail(),
+  body('phone_no')
+    .matches(/^\d{10}$/) 
+    .withMessage('Phone number must be a 10-digit numeric value'),
   async (req, res) => {
     try {
       const repeatedEmail = await Admin.find({ email: req.body.email });
@@ -39,6 +42,10 @@ router.post(
               name:req.body.name,
               email: req.body.email,
               password: hash,
+              phone_no:req.body.phone_no,
+              admin_city:req.body.admin_city,
+              admin_state:req.body.admin_state,
+              admin_country:req.body.admin_country
             });
           });
           res.status(200).json({
@@ -107,13 +114,13 @@ router.post("/login", async (req, res) => {
 // getting name for rendering in sidebar 
 router.get('/get/:id', async (req, res) => {
   try {
-    const id = req.params.id;
+    const ID = req.params.id;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(ID)) {
       return res.status(400).json({ message: 'Invalid ObjectId format' });
     }
 
-    const adminData = await Admin.findOne({ _id: id });
+    const adminData = await Admin.findOne({ _id: ID });
 
     if (adminData) {
       res.json(adminData);
@@ -148,6 +155,19 @@ router.delete("/admin/:id", async (req, res) => {
   
 })
 
+router.put('/admin/:id', async (req, res) => {
+
+  try {
+      const data = req.body;
+      const admin = await Admin.findOneAndUpdate({ _id: req.params.id }, data);
+      res.json({ result: admin });
+
+  }
+  catch (e) {
+      res.status(400).json({ message: e.message });
+  }
+
+});
 
 
 module.exports = router;

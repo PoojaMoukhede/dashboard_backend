@@ -49,6 +49,13 @@ router.post(
     // User.init()
     console.log("hello register");
     try {
+      const existingUser = await User.findOne({ Emp_ID: req.body.Emp_ID });
+      if (existingUser) {
+        return res.status(400).json({
+          status: 'Failed',
+          message: 'Employee ID already exists',
+        });
+      }
       const repeatedEmail = await User.find({ email: req.body.email });
       if (repeatedEmail.length === 0) {
         const errors = validationResult(req);
@@ -78,6 +85,8 @@ router.post(
               Emp_qualification: req.body.Emp_qualification,
               Emp_expertise: req.body.Emp_expertise,
               password: hash,
+              Emp_designation:req.body.Emp_designation,
+              Emp_country:req.body.Emp_country
             });
             const newLeaveBalance = await LeaveBalance.create({
               userRef: user._id,
@@ -168,7 +177,7 @@ router.get("/empdata", async (req, res) => {
     res.status(400).json({ message: e.message });
     console.log(e);
   }
-});
+}); 
 
 // for birthday and work anniversary updated 
 

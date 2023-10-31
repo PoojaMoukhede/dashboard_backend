@@ -6,6 +6,7 @@ const managerSchema = new mongooose.Schema({
     email: { type: String},
     contact_no: { type: String },
     city:{type: String },
+    country:{type: String },
     state:{type: String },
     blood_group:{type: String },
     department:{type:String},

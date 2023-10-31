@@ -13,10 +13,12 @@ const userSchema = new mongooose.Schema({
   Emp_joining_date: { type: String},
   Emp_blood_group:{type:String},
   Emp_qualification:{type:String},
-  Emp_expertise:{type:String}
+  Emp_expertise:{type:String},
+  Emp_country:{type:String},
+  Emp_designation:{type:String},
 });
 
 const User = mongooose.model("users", userSchema);
-
-module.exports = User;
  
+module.exports = User;
+  
