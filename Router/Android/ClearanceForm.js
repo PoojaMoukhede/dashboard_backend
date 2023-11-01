@@ -440,8 +440,7 @@ router.post("/form",uploadImg, async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
-    console.log(`req.body : ${req.body.fileSize}`)
-    console.log(`req.body : ${req.body.size}`)
+
 
     const totalExpense = Food + Hotel + Water + Other_Transport;
     let fuelInLiters = 0;
@@ -466,6 +465,7 @@ router.post("/form",uploadImg, async (req, res) => {
         timestamp: new Date(),
       });
       await clearance_data.save();
+      console.log(`req.file : ${req.file.size}`)
     } else {
       clearance_data = new Clearance({
         FormData: [
