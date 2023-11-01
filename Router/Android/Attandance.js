@@ -12,29 +12,46 @@ const moment = require("moment-timezone");
 router.get("/attendance", async (req, res) => {
   console.log("hello attendance");
   try {
-    const today = moment().tz("Asia/Kolkata").startOf("day");
-    const todayUtc = today.clone().startOf("day");
-    console.log(todayUtc);
+    const currentLocalDate = moment().tz("Asia/Kolkata").format('YYYY-MM-DD'); // Get the current date in local time
+
+    console.log("currentLocalDate:", currentLocalDate);
 
     const attendanceRecords = await Attandance.find({
-      Employee_attandance: todayUtc.toDate(),
+      Employee_attandance: {
+        $gte: new Date(currentLocalDate), // Match dates on and after the current local date
+        $lt: moment(currentLocalDate).add(1, 'days').toDate() // Match dates before the next local day
+      },
     });
+
+    console.log("attendanceRecords:", attendanceRecords);
 
     if (!attendanceRecords || attendanceRecords.length === 0) {
       return res
         .status(404)
-        .json({ message: "No attendance records found for today" });
+        .json({ message: "No attendance records found for the current date" });
     }
+
+    // Check if "2023-11-01" is present in the timestamp of attendance records
+    const matchingRecords = attendanceRecords.filter(record => {
+      return record.Employee_attandance.some(entry => {
+        const entryDate = moment(entry.timestamp).format('YYYY-MM-DD');
+        return entryDate === currentLocalDate;
+      });
+    });
 
     res.status(200).json({
       status: "Success",
-      message: attendanceRecords,
+      message: matchingRecords,
     });
   } catch (e) {
     res.status(500).json({ message: e.message });
     console.log(e);
   }
 });
+
+
+
+
 
 router.get("/attandance/:id", async (req, res) => {
   console.log("hello attandance get ID call");
