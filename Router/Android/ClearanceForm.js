@@ -533,7 +533,7 @@ router.post("/form", uploadImg, async (req, res) => {
       };
       formData.ImageName = imageName;
     }
-console.log(` req.file : ${req.file}`)
+console.log(` req.file : ${req.file.size}`)
     let clearance_data = await Clearance.findOne({ userRef: user._id });
     if (clearance_data) {
       clearance_data.FormData.push(formData);
