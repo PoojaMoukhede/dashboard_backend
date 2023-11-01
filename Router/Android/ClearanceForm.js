@@ -420,83 +420,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const uploadImg = multer({storage: storage}).single('image');
 
-// router.post("/form",uploadImg, async (req, res) => {
-//   console.log("Hello form post call");
-//   try {
-//     const userId = req.body.userId;
-//     const user = await User.findOne({ _id: userId });
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     // const image = req.file.path;
-//     const image = req.file;
-//     const imageName = req.body.ImageName;
-//     const transportType = req.body.Transport_type;
-//     const Food = parseFloat(req.body.Food) || 0;
-//     const Hotel = parseFloat(req.body.Hotel) || 0;
-//     const Water = parseFloat(req.body.Water) || 0;
-//     const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
-//     if (!req.file) {
-//       return res.status(400).json({ message: "No file uploaded" });
-//     }
-//     const totalExpense = Food + Hotel + Water + Other_Transport;
-//     let fuelInLiters = 0;
-//     if (transportType === "Car" || transportType === "Bike") {
-//       fuelInLiters = req.body.Fuel_in_liters;
-//     }
-//     let clearance_data = await Clearance.findOne({ userRef: user._id });
-//     if (clearance_data) {
-//       clearance_data.FormData.push({
-//         Transport_type: transportType,
-//         Food: Food,
-//         Water: Water,
-//         Hotel: Hotel,
-//         Other_Transport: Other_Transport,
-//         Total_expense: totalExpense,
-//         Fuel_in_liters: fuelInLiters,
-//         images: {
-//           data: image.buffer,
-//           contentType: image.mimetype,
-//         },
-//         ImageName: imageName,
-//         timestamp: new Date(),
-//       });
-//       await clearance_data.save();
-//     } else {
-//       clearance_data = new Clearance({
-//         FormData: [
-//           {
-//             Transport_type: transportType,
-//             Food: Food,
-//             Water: Water,
-//             Hotel: Hotel,
-//             Other_Transport: Other_Transport,
-//             Total_expense: totalExpense,
-//             Fuel_in_liters: fuelInLiters,
-//             images: {
-//               data: image.buffer,
-//               contentType: image.mimetype,
-//             },
-//             ImageName: imageName,
-//             timestamp: new Date(),
-//           },
-//         ],
-//         userRef: user._id,
-//       });
-//       await clearance_data.save();
-//     }
-//     res.status(200).json({
-//       status: "Success",
-//       message: "Clearance form added successfully",
-//     });
-//   } catch (e) {
-//     res.status(400).json({ message: e.message });
-//     console.log(e);
-//   }
-// });
-
-router.post("/form", uploadImg, async (req, res) => {
+router.post("/form",uploadImg, async (req, res) => {
   console.log("Hello form post call");
   try {
     const userId = req.body.userId;
@@ -505,47 +429,66 @@ router.post("/form", uploadImg, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // const image = req.file.path;
+    const image = req.file;
+    const imageName = req.body.ImageName;
     const transportType = req.body.Transport_type;
     const Food = parseFloat(req.body.Food) || 0;
     const Hotel = parseFloat(req.body.Hotel) || 0;
     const Water = parseFloat(req.body.Water) || 0;
     const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
-    const imageName = req.body.ImageName;
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+    console.log(`req.body : ${req.body.fileSize}`)
+    console.log(`req.body : ${req.body.size}`)
 
-    const formData = {
-      Transport_type: transportType,
-      Food: Food,
-      Water: Water,
-      Hotel: Hotel,
-      Other_Transport: Other_Transport,
-      Total_expense: Food + Hotel + Water + Other_Transport,
-      timestamp: new Date(),
-    };
-
+    const totalExpense = Food + Hotel + Water + Other_Transport;
+    let fuelInLiters = 0;
     if (transportType === "Car" || transportType === "Bike") {
-      formData.Fuel_in_liters = req.body.Fuel_in_liters;
+      fuelInLiters = req.body.Fuel_in_liters;
     }
-
-    if (req.file) {
-      formData.images = {
-        data: req.file.buffer,
-        contentType: req.file.mimetype,
-      };
-      formData.ImageName = imageName;
-    }
-console.log(` req.file : ${req.file.size}`)
     let clearance_data = await Clearance.findOne({ userRef: user._id });
     if (clearance_data) {
-      clearance_data.FormData.push(formData);
+      clearance_data.FormData.push({
+        Transport_type: transportType,
+        Food: Food,
+        Water: Water,
+        Hotel: Hotel,
+        Other_Transport: Other_Transport,
+        Total_expense: totalExpense,
+        Fuel_in_liters: fuelInLiters,
+        images: {
+          data: image.buffer,
+          contentType: image.mimetype,
+        },
+        ImageName: imageName,
+        timestamp: new Date(),
+      });
+      await clearance_data.save();
     } else {
       clearance_data = new Clearance({
-        FormData: [formData],
+        FormData: [
+          {
+            Transport_type: transportType,
+            Food: Food,
+            Water: Water,
+            Hotel: Hotel,
+            Other_Transport: Other_Transport,
+            Total_expense: totalExpense,
+            Fuel_in_liters: fuelInLiters,
+            images: {
+              data: image.buffer,
+              contentType: image.mimetype,
+            },
+            ImageName: imageName,
+            timestamp: new Date(),
+          },
+        ],
         userRef: user._id,
       });
+      await clearance_data.save();
     }
-
-    await clearance_data.save();
-
     res.status(200).json({
       status: "Success",
       message: "Clearance form added successfully",
@@ -555,6 +498,66 @@ console.log(` req.file : ${req.file.size}`)
     console.log(e);
   }
 });
+
+// router.post("/form", uploadImg, async (req, res) => {
+//   console.log("Hello form post call");
+//   try {
+//     const userId = req.body.userId;
+//     const user = await User.findOne({ _id: userId });
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     const transportType = req.body.Transport_type;
+//     const Food = parseFloat(req.body.Food) || 0;
+//     const Hotel = parseFloat(req.body.Hotel) || 0;
+//     const Water = parseFloat(req.body.Water) || 0;
+//     const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
+//     const imageName = req.body.ImageName;
+
+//     const formData = {
+//       Transport_type: transportType,
+//       Food: Food,
+//       Water: Water,
+//       Hotel: Hotel,
+//       Other_Transport: Other_Transport,
+//       Total_expense: Food + Hotel + Water + Other_Transport,
+//       timestamp: new Date(),
+//     };
+
+//     if (transportType === "Car" || transportType === "Bike") {
+//       formData.Fuel_in_liters = req.body.Fuel_in_liters;
+//     }
+
+//     if (req.file) {
+//       formData.images = {
+//         data: req.file.buffer,
+//         contentType: req.file.mimetype,
+//       };
+//       formData.ImageName = imageName;
+//     }
+// console.log(` req.file : ${req.file.size}`)
+//     let clearance_data = await Clearance.findOne({ userRef: user._id });
+//     if (clearance_data) {
+//       clearance_data.FormData.push(formData);
+//     } else {
+//       clearance_data = new Clearance({
+//         FormData: [formData],
+//         userRef: user._id,
+//       });
+//     }
+
+//     await clearance_data.save();
+
+//     res.status(200).json({
+//       status: "Success",
+//       message: "Clearance form added successfully",
+//     });
+//   } catch (e) {
+//     res.status(400).json({ message: e.message });
+//     console.log(e);
+//   }
+// });
 
 router.post("/update-profile-image/:id", upload.single("profileImage"), async (req, res) => {
   try {
