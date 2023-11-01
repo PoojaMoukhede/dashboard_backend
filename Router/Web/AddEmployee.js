@@ -103,6 +103,15 @@ router.post('/importdata', upload.single('file'), async (req, res) => {
     }
   });
 
+  router.delete("/Users", async (req, res) => {
+    const selectedUsers = req.body; // Get the array of selected email addresses
+    try {
+      const User_data = await User.deleteMany({ email: { $in: selectedUsers } });
+      res.send("User's data has been Deleted");
+    } catch (error) {
+      res.status(500).send("Error deleting User data: " + error.message);
+    }
+  });
 
 
 module.exports = router;

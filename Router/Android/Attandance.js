@@ -13,8 +13,8 @@ router.get("/attendance", async (req, res) => {
   console.log("hello attendance");
   try {
     const today = moment().tz("Asia/Kolkata").startOf("day");
-    const todayUtc = today.clone().utc();
-    // console.log(todayUtc.toDate());
+    const todayUtc = today.clone().startOf("day");
+    console.log(todayUtc);
 
     const attendanceRecords = await Attandance.find({
       Employee_attandance: todayUtc.toDate(),

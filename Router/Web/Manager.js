@@ -74,11 +74,14 @@ router.delete("/manager/:id", async (req, res) => {
 })
 
 router.delete("/manager", async (req, res) => {
-    const selectedUser= req.body._id;
-    const Manager_data = await Manager.deleteMany({ _id: selectedUser });
-    res.send("Manager's data has been Deleted");
-    
-})
+    const selectedUsers = req.body; // Get the array of selected email addresses
+    try {
+      const Manager_data = await Manager.deleteMany({ email: { $in: selectedUsers } });
+      res.send("Manager's data has been Deleted");
+    } catch (error) {
+      res.status(500).send("Error deleting Manager data: " + error.message);
+    }
+  });
 
 
 
