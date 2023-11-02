@@ -466,6 +466,8 @@ router.post("/form",uploadImg, async (req, res) => {
       });
       await clearance_data.save();
       console.log(`req.file : ${req.file.size}`)
+      console.log(`clearance_data if : ${clearance_data}`)
+
     } else {
       clearance_data = new Clearance({
         FormData: [
@@ -488,6 +490,8 @@ router.post("/form",uploadImg, async (req, res) => {
         userRef: user._id,
       });
       await clearance_data.save();
+      console.log(`clearance_data else : ${clearance_data}`)
+
     }
     res.status(200).json({
       status: "Success",
