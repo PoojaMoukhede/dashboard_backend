@@ -3,6 +3,7 @@ const router = express.Router();
 const Leave = require("../../Model/Android/Leave");
 const User = require("../../Model/Android/User");
 const LeaveBalance = require("../../Model/Android/LeaveBalance");
+const Notification = require('../../Model/Web/Notification')
 
 router.post("/leave/:id", async (req, res) => {
   console.log("POST CALL LEAVE");
@@ -23,7 +24,6 @@ router.post("/leave/:id", async (req, res) => {
         (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
       );
     }
-
     const newLeaveRequest = {
       startDate,
       endDate,
@@ -41,6 +41,13 @@ router.post("/leave/:id", async (req, res) => {
       });
       await newLeaveDocument.save();
     }
+    const newNotification = new Notification({
+      userId: user._id, 
+      message: `${user.Emp_name} has applied for leave.`,
+    });
+    
+    // Save the notification to the database
+    await newNotification.save();
 
     res.status(200).json({
       status: "Success",

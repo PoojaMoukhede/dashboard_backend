@@ -7,6 +7,7 @@ const e_route = require("./Router/Web/AddEmployee");
 const m_route = require("./Router/Web/Manager");
 const event_route = require("./Router/Web/Event");
 const Leave_route = require('./Router/Android/Leave')
+const notification = require('./Router/Web/Notification')
 // const sendEmail = require('./utils/sendMail')
 const canteen_route = require("./Router/Web/Canteen");
 const nodemailer = require("nodemailer");
@@ -47,11 +48,14 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   next();
 });
+
+
 app.use("/", route);
 app.use("/", e_route);
 app.use("/", m_route);
 app.use("/", event_route);
 app.use("/", canteen_route);
+app.use('/', notification)
 
 // Android
 app.use("/", Android_user);

@@ -4,6 +4,7 @@ const Complaint = require("../../Model/Android/Complaint")
 const jwt = require("jsonwebtoken")
 const secret ="SECRET"
 const User = require("../../Model/Android/User")
+const Notification = require('../../Model/Web/Notification')
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
@@ -156,6 +157,14 @@ router.post('/complaint', async (req, res) => {
       });
       await complaint.save();
     }
+    const newNotification = new Notification({
+      userId: user._id, 
+      message: `${user.Emp_name} file a complaint.`,
+    });
+    
+    // Save the notification to the database
+    await newNotification.save();
+
 
     res.status(200).json({
       status: "Success",

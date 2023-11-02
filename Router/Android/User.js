@@ -5,7 +5,6 @@ const { body, validationResult } = require("express-validator");
 const User = require("../../Model/Android/User");
 const jwt = require("jsonwebtoken");
 const secret = "SECRET";
-const Fuel = require("../../Model/Web/Fuel");
 const LeaveBalance = require("../../Model/Android/LeaveBalance")
 
 
@@ -180,7 +179,6 @@ router.get("/empdata", async (req, res) => {
 }); 
 
 // for birthday and work anniversary updated 
-
 router.get('/updates', async (req, res) => {
   console.log('get request by android');
   try {
@@ -246,56 +244,6 @@ router.get("/user/:id", async (req, res) => {
   }
 });
 
-router.get("/fuel", async (req, res) => {
-  try {
-    const results = await Fuel.find();
-    res.json(results);
-    // console.log("Result in GET:", results);
-  } catch (e) {
-    res.status(400).json({ message: e.message });
-    console.log(e);
-  }
-});
 
-// fuel
-router.post("/fuel", async (req, res) => {
-  try {
-    const { month, Liters } = req.body;
-    const newFuelConsumption = new Fuel({
-      month,
-      Liters,
-    });
-    const insertedData = await newFuelConsumption.save();
-    res.json(insertedData);
-    console.log("Inserted data:", insertedData);
-  } catch (e) {
-    res.status(400).json({ message: e.message });
-    console.error(e);
-  }
-});
-
-router.get("/fuel", async (req, res) => {
-  try {
-    const results = await Fuel.find();
-    res.json(results);
-    // console.log("Result in GET:", results);
-  } catch (e) {
-    res.status(400).json({ message: e.message });
-    console.error(e);
-  }
-});
-router.get("/fuel/curr", async (req, res) => {
-  try {
-    const currentDate = new Date();
-    const currentMonth = format(currentDate, "MMMM"); // Format the current month
-
-    const results = await Fuel.find({ month: currentMonth });
-
-    res.json(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
 
 module.exports = router;
