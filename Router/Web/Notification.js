@@ -34,4 +34,19 @@ router.delete('/notifications', async (req, res) => {
   }
 });
 
+
+router.put('/notifications/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { status } = req.body;
+    const notification = await Notification.findByIdAndUpdate(id, { status }, { new: true });
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+    res.json(notification);
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
+
 module.exports = router;

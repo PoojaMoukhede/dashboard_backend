@@ -2,8 +2,10 @@ const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema({
   userRef: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
-  title: { type: String, require: true },
   message: String,
+  status:{type:String, default: 'pending'},
   timestamp: { type: Date, default: Date.now },
 });
-module.exports = mongoose.model("notification", notificationSchema);
+
+const Notification = mongoose.model("notification", notificationSchema);
+module.exports = Notification;
