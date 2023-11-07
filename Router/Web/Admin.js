@@ -5,22 +5,24 @@ const { body, validationResult } = require("express-validator");
 const Admin = require("../../Model/Web/Admin");
 const jwt = require("jsonwebtoken");
 const secret = "SECRET";
-const mongoose = require("mongoose")
-
-
+const mongoose = require("mongoose");
+const multer = require("multer");
+const app = express();
+const fs = require("fs");
+const path = require("path");
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
-
+app.use(express.static("public"));
 // register
 router.post(
   "/register",
   body("password"),
   body("confirm_password"),
   body("email").isEmail(),
-  body('phone_no')
-    .matches(/^\d{10}$/) 
-    .withMessage('Phone number must be a 10-digit numeric value'),
+  body("phone_no")
+    .matches(/^\d{10}$/)
+    .withMessage("Phone number must be a 10-digit numeric value"),
   async (req, res) => {
     try {
       const repeatedEmail = await Admin.find({ email: req.body.email });
@@ -39,13 +41,13 @@ router.post(
           const salt = await bcrypt.genSalt(12);
           bcrypt.hash(req.body.password, salt, async (err, hash) => {
             await Admin.create({
-              name:req.body.name,
+              name: req.body.name,
               email: req.body.email,
               password: hash,
-              phone_no:req.body.phone_no,
-              admin_city:req.body.admin_city,
-              admin_state:req.body.admin_state,
-              admin_country:req.body.admin_country
+              phone_no: req.body.phone_no,
+              admin_city: req.body.admin_city,
+              admin_state: req.body.admin_state,
+              admin_country: req.body.admin_country,
             });
           });
           res.status(200).json({
@@ -58,7 +60,8 @@ router.post(
           status: "Failed",
           error: "User Already Exists",
         });
-      }  console.log(req.body)
+      }
+      console.log(req.body);
     } catch (error) {
       res.status(500).json({
         status: "Failed",
@@ -66,7 +69,6 @@ router.post(
       });
     }
   }
- 
 );
 
 //login
@@ -96,7 +98,7 @@ router.post("/login", async (req, res) => {
         });
       }
     } catch (err) {
-      console.log('Comparison error: ', err);
+      console.log("Comparison error: ", err);
       res.status(500).json({
         status: "error",
         message: "Internal server error",
@@ -108,16 +110,15 @@ router.post("/login", async (req, res) => {
       message: "No Admin Found",
     });
   }
-  
 });
- 
-// getting name for rendering in sidebar 
-router.get('/get/:id', async (req, res) => {
+
+// getting name for rendering in sidebar
+router.get("/get/:id", async (req, res) => {
   try {
     const ID = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(ID)) {
-      return res.status(400).json({ message: 'Invalid ObjectId format' });
+      return res.status(400).json({ message: "Invalid ObjectId format" });
     }
 
     const adminData = await Admin.findOne({ _id: ID });
@@ -125,48 +126,71 @@ router.get('/get/:id', async (req, res) => {
     if (adminData) {
       res.json(adminData);
     } else {
-      res.status(404).json({ message: 'Admin not found' });
+      res.status(404).json({ message: "Admin not found" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-
 //getting all admin
-router.get('/getAdmin', async (req, res) => {  
+router.get("/getAdmin", async (req, res) => {
   try {
-      const results = await Admin.find();
-      res.json(results);
-      // console.log( "result in get" ,results )
+    const results = await Admin.find();
+    res.json(results);
+    // console.log( "result in get" ,results )
   } catch (e) {
-      res.status(400).json({ message: e.message });
-      console.log(e);
+    res.status(400).json({ message: e.message });
+    console.log(e);
   }
- 
-})
-
+});
 
 router.delete("/admin/:id", async (req, res) => {
   const ID = req.params.id;
   const admin_data = await Admin.findOneAndDelete({ _id: ID });
   res.send("Event's data has been Deleted");
-  
-})
+});
 
-router.put('/admin/:id', async (req, res) => {
-
+router.put("/admin/:id", async (req, res) => {
   try {
-      const data = req.body;
-      const admin = await Admin.findOneAndUpdate({ _id: req.params.id }, data);
-      res.json({ result: admin });
-
+    const data = req.body;
+    const admin = await Admin.findOneAndUpdate({ _id: req.params.id }, data);
+    res.json({ result: admin });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
   }
-  catch (e) {
-      res.status(400).json({ message: e.message });
-  }
+});
 
+const storage = multer.memoryStorage();
+const upload2 = multer({ storage: storage });
+
+router.put("/update-profile-image/:id", upload2.single("profileImage"), async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await Admin.findOneAndUpdate({ _id: userId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log(req.file);
+    if (req.file) {
+      const fileName = req.file.originalname;
+      console.log(fileName);
+      fs.writeFileSync(path.join("uploads2/", fileName), req.file.buffer);
+
+      user.profileImage = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      };
+      await user.save();
+    }
+
+    res.status(200).json({ message: "Profile image updated successfully", user: user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 

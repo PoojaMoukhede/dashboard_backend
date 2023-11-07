@@ -8,6 +8,10 @@ const adminSchema = new mongooose.Schema({
     admin_state:{type:String},
     admin_country:{type:String},
     password: { type: String, required: true },
+    profileImage: {
+        data: Buffer,
+        contentType: String,
+    },
 })
 
 const Admin = mongooose.model('admins', adminSchema);

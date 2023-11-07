@@ -34,20 +34,6 @@ router.get('/Users/:id', async (req, res) => {
   }
 }); 
 
-// To add new employee
-// router.post('/Users', async (req, res) => { 
-//     try {
-//         let Employee_data = await User.create({
-//             ...req.body
-//         });
-//         //    console.log("Employee_data" ,Employee_data)
-//         res.status(201).json(Employee_data);
-//     } catch (e) {
-//         res.status(400).json({ message: e.message });
-//     }
-   
-// }) 
-
 router.put('/Users/:id', async (req, res) => {
 
   try {
@@ -69,13 +55,6 @@ router.delete("/Users/:id", async (req, res) => {
   res.send("Employee's data has been Deleted");
   
 })
-// router.delete("/deleteEmployee", async (req, res) => {
-//   const ID = req.params.id;
-//   const employee = await Employee.({ _id: ID });
-//   res.send("Employee's data has been Deleted");
-  
-// })
-
 
 // for importing file and save data into database
 router.post('/importdata', upload.single('file'), async (req, res) => {
@@ -113,5 +92,35 @@ router.post('/importdata', upload.single('file'), async (req, res) => {
     }
   });
 
+  const storage = multer.memoryStorage();
+  const upload2 = multer({ storage: storage });
+  
+  router.put("/update-profile-image/:id", upload2.single("profileImage"), async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const user = await User.findOneAndUpdate({ _id: userId });
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      console.log(req.file);
+      if (req.file) {
+        const fileName = req.file.originalname;
+        console.log(fileName);
+        fs.writeFileSync(path.join("uploads2/", fileName), req.file.buffer);
+  
+        user.profileImage = {
+          data: req.file.buffer,
+          contentType: req.file.mimetype,
+        };
+        await user.save();
+      }
+  
+      res.status(200).json({ message: "Profile image updated successfully", user: user });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 
 module.exports = router;

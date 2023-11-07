@@ -16,6 +16,10 @@ const userSchema = new mongooose.Schema({
   Emp_expertise:{type:String},
   Emp_country:{type:String},
   Emp_designation:{type:String},
+  profileImage: {
+    data: Buffer,
+    contentType: String,
+},
 });
 
 const User = mongooose.model("users", userSchema);

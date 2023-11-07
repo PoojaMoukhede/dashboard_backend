@@ -563,23 +563,6 @@ router.post("/form",uploadImg, async (req, res) => {
 //   }
 // });
 
-router.post("/update-profile-image/:id", upload.single("profileImage"), async (req, res) => {
-  try {
-    const userId = req.params.id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
 
-    if (req.file) {
-      user.profileImage = req.file.filename;
-      await user.save();
-    }
-
-    res.status(200).json({ message: "Profile image updated successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 module.exports = router;

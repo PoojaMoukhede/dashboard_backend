@@ -6,12 +6,12 @@ const route = require("./Router/Web/Admin");
 const e_route = require("./Router/Web/AddEmployee");
 const m_route = require("./Router/Web/Manager");
 const event_route = require("./Router/Web/Event");
-const Leave_route = require('./Router/Android/Leave')
-const notification = require('./Router/Web/Notification')
+const Leave_route = require("./Router/Android/Leave");
+const notification = require("./Router/Web/Notification");
 // const sendEmail = require('./utils/sendMail')
 const canteen_route = require("./Router/Web/Canteen");
 const nodemailer = require("nodemailer");
-const path = require('path')
+const path = require("path");
 //Android routing
 const Android_user = require("./Router/Android/User");
 const Clearance_form = require("./Router/Android/ClearanceForm");
@@ -19,12 +19,13 @@ const Attandance = require("./Router/Android/Attandance");
 const Location = require("./Router/Android/Location");
 const Complaint = require("./Router/Android/Complaint");
 // const LatLong = require('./Router/Android/LatLong')
-const uploadMiddleware = require("./Middleware/Uploads") ;
+const uploadMiddleware = require("./Middleware/Uploads");
+require('request').defaults({ rejectUnauthorized: false })
 
 const cors = require("cors");
 app.use(cors());
 require("dotenv").config();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 80;
 
 mongoose
   .connect(process.env.DATABASE_URL, {
@@ -39,23 +40,28 @@ mongoose
   });
 
 app.use(express.json());
-app.use(bodyParser.json({limit:1024*1024*20, type:'application/json'}));
-app.use(bodyParser.urlencoded({extended:true,limit:1024*1024*20,type:'application/x-www-form-urlencoding' }));
+app.use(bodyParser.json({ limit: 1024 * 1024 * 20, type: "application/json" }));
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: 1024 * 1024 * 20,
+    type: "application/x-www-form-urlencoding",
+  })
+);
 // app.use(bodyParser.urlencoded({ extended: true}));
 // app.use(bodyParser.json());
-app.use(express.urlencoded({limit: '50mb'}));
+app.use(express.urlencoded({ limit: "50mb" }));
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   next();
 });
-
 
 app.use("/", route);
 app.use("/", e_route);
 app.use("/", m_route);
 app.use("/", event_route);
 app.use("/", canteen_route);
-app.use('/', notification)
+app.use("/", notification);
 
 // Android
 app.use("/", Android_user);
@@ -63,9 +69,9 @@ app.use("/", Clearance_form);
 app.use("/", Attandance);
 app.use("/", Location);
 app.use("/", Complaint);
-app.use('/', Leave_route);
+app.use("/", Leave_route);
 // app.use('/', LatLong);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.get("/", function (req, res) {
   res.send("Hello World");
   console.log("Browser request");
@@ -91,17 +97,22 @@ app.get("/", function (req, res) {
 // });
 
 // for web only
-app.post("/api/test-email", async (req, res) => {
+app.post("/test-email", async (req, res) => {
   console.log("Email api call");
   try {
     console.log("Email api call 1");
     await sendEmail({
-      to: "pooja3000000000@gmail.com",
-      from: "poojamoukhede27@gmail.com",
-      subject: "Does this work?",
-      text: "Glad you are here .. yes you!",
-      html: "<strong>It is working!!</strong>",
+      recipient_email: "pooja3000000000@gmail.com",
+      OTP: "123456",
     });
+    console.log("Email api call 3");
+    // await sendEmail({
+    //   to: "pooja3000000000@gmail.com",
+    //   from: "poojamoukhede27@gmail.com",
+    //   subject: "Does this work?",
+    //   text: "Glad you are here .. yes you!",
+    //   html: "<strong>It is working!!</strong>",
+    // });
     console.log("Email sent successfully");
     res.sendStatus(200);
   } catch (e) {
@@ -114,16 +125,33 @@ app.post("/api/test-email", async (req, res) => {
 });
 
 function sendEmail({ recipient_email, OTP }) {
+  console.log("Email api call 2");
   return new Promise((resolve, reject) => {
     var transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.MY_EMAIL,
-        pass: process.env.API_KEY,
+        user: process.env.API_KEY,
+        // pass: process.env.API_KEY,
+      },
+      tls: {
+        rejectUnauthorized: true,
       },
     });
 
     const mail_configs = {
+      host:"192.168.1.211",
+      port: 443,
+      path: '/',
+      // ca: [fs.readFileSync([certificate path], {encoding: 'utf-8'})],
+      method: 'POST',
+      
+      rejectUnauthorized: true,
+      requestCert: true,
+      agent: false,
+      tls: {
+        secureProtocol: "TLSv1_method",
+        secureConnection: true,
+      },
       from: process.env.MY_EMAIL,
       to: recipient_email,
       subject: "PASSWORD RECOVERY",
@@ -158,9 +186,9 @@ function sendEmail({ recipient_email, OTP }) {
     transporter.sendMail(mail_configs, function (error, info) {
       if (error) {
         console.log(error);
-        return reject({ message: `An error has occured` });
+        return reject({ message: `An error has occured : ${error}` });
       }
-      return resolve({ message: "Email sent succesfuly" });
+      return resolve({ message: `Email sent succesfuly : ${error}` });
     });
   });
 }
@@ -176,31 +204,6 @@ app.post("/send_recovery_email", (req, res) => {
     .catch((error) => res.status(500).send(error.message));
 });
 
-// var transport = nodemailer.createTransport({
-//   host: "sandbox.smtp.mailtrap.io",
-//   port: 2525,
-//   auth: {
-//     user: "edd4bd511f722d",
-//     pass: "8fc69c9724dd75"
-//   }
-// });
-
-// async function main() {
-//   const info = await transport.sendMail({
-//     to: 'poojamoukhede27@gmail.com',
-//     from: 'pooja3000000000@gmail.com',
-//     subject: "Hello ✔",
-//     text: "Hello world?",
-//     html: "<b>Hello world?</b>",
-//   });
-
-//   console.log("Message sent: %s", info.messageId);
-
-// }
-
-
-app.listen(port, () => {
+app.listen(8080, () => {
   console.log(`server is up on port ${port}`);
 });
-
-// app.keepAliveTimeout = 60000;

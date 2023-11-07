@@ -83,6 +83,10 @@ router.put("/leave/:id", async (req, res) => {
       return res.status(400).json({ error: `Leave request with id ${requestId} is already approved` });
     }
 
+    if (leaveInfo.status === "rejected" && status === "rejected") {
+      return res.status(400).json({ error: `Leave request with id ${requestId} is already rejected` });
+    }
+
     const user = await User.findOne({ _id: updatedLeave.userRef });
 
     if (!user) {
@@ -107,8 +111,12 @@ router.put("/leave/:id", async (req, res) => {
 
         leave.availableLeave -= leaveDays; // Deduct leave days from LeaveBalance
       } else if (status === "rejected") {
-        // Retrieve the deducted leave days if the status is "rejected"
-        leave.availableLeave += leaveDays;
+        // Mark the leave request as rejected (if it's not already rejected)
+        if (!leaveInfo.rejected) {
+          leaveInfo.status = status;
+          leaveInfo.rejected = true;
+          leave.availableLeave += leaveDays; // Refund the deducted leave days
+        }
       }
     } else {
       return res.status(400).json({ error: "Invalid value for availableLeave" });
