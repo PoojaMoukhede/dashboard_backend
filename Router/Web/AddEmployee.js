@@ -95,6 +95,8 @@ router.post('/importdata', upload.single('file'), async (req, res) => {
   const storage = multer.memoryStorage();
   const upload2 = multer({ storage: storage });
   
+
+  // to update profile image
   router.put("/update-profile-image/:id", upload2.single("profileImage"), async (req, res) => {
     try {
       const userId = req.params.id;

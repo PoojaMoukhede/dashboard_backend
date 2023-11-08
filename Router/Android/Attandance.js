@@ -49,25 +49,17 @@ router.get("/attendance", async (req, res) => {
   }
 });
 
-
-
-
-
 router.get("/attandance/:id", async (req, res) => {
   console.log("hello attandance get ID call");
 
   try {
     const userId = req.params.id; //mongo
-    // console.log(userId);
-
     const user = await User.findOne({ _id: userId });
-    // console.log(`user : ${user}`);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     const attendance = await Attandance.findOne({ userRef: user._id });
-    // console.log(`Employee attandance : ${attendance}`);
 
     if (!attendance) {
       return res.status(404).json({ message: "Attendance record not found" });
@@ -84,11 +76,10 @@ router.get("/attandance/:id", async (req, res) => {
 
 router.put("/attendance/:id", async (req, res) => {
   try {
-    const userId = req.params.id; // User's _id from the route parameter
+    const userId = req.params.id; 
     console.log(userId);
 
     const user = await User.findOne({ _id: userId });
-    // console.log(`user : ${user}`);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -274,10 +265,7 @@ router.post("/attendance", async (req, res) => {
 router.get("/leave-balance/:id", async (req, res) => {
   try {
     const userId = req.params.id;
-    // console.log(userId);
-
     const user = await User.findOne({ _id: userId });
-    // console.log(`user : ${user}`);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -299,61 +287,35 @@ router.get("/leave-balance/:id", async (req, res) => {
 });
 
 //department wise attandance
-router.get('/departmentWise', async (req, res) => {
-  const today = new Date().toISOString().slice(0, 10);
+router.get("/departmentWise", async (req, res) => {
+  const today = new Date().toISOString().slice(0, 10); // Get today's date in ISO format (YYYY-MM-DD)
   console.log(`today : ${today}`);
-
-  const department = 'Software';
+  const department = "Software";
 
   try {
     const results = await Attandance.find({
-      'Employee_attandance.timestamp': {
-        $gte: new Date(today), // Start of the day
-      }
+      "Employee_attandance.timestamp": {
+        $gte: new Date(today),
+      }, // Today's date
     })
-    .populate('userRef')
-    .exec();
+      .populate("userRef")
+      .exec();
 
     // Filter the results by department
-    const filteredResults = results.filter(result => result.userRef.Emp_department === department);
+    const filteredResults = results.filter(
+      (result) => result.userRef.Emp_department === department
+    );
     console.log(filteredResults);
 
-    res.json(filteredResults); // Send the filtered results as JSON response
+    if (filteredResults.length > 0) {
+      res.json(filteredResults); // Send the first matched document as JSON response
+    } else {
+      res.json({ message: "No matching record for today" });
+    }
   } catch (err) {
     console.error(err);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send("Internal Server Error");
   }
-}); 
-
-// router.get("/departmentWise", async (req, res) => {
-//   const today = new Date().toISOString().slice(0, 10); // Get today's date in ISO format (YYYY-MM-DD)
-//   console.log(`today : ${today}`);
-//   const department = "Software";
-
-//   try {
-//     const results = await Attandance.find({
-//       "Employee_attandance.timestamp": {
-//         $gte: new Date(today),
-//       }, // Today's date
-//     })
-//       .populate("userRef")
-//       .exec();
-
-//     // Filter the results by department
-//     const filteredResults = results.filter(
-//       (result) => result.userRef.Emp_department === department
-//     );
-//     console.log(filteredResults);
-
-//     if (filteredResults.length > 0) {
-//       res.json(filteredResults[0]); // Send the first matched document as JSON response
-//     } else {
-//       res.json({ message: "No matching record for today" });
-//     }
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Internal Server Error");
-//   }
-// });
+});
 
 module.exports = router;

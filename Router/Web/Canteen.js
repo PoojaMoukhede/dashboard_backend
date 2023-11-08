@@ -94,6 +94,9 @@ router.post("/menu/buy", async (req, res) => {
     }
 
     let couponPurchase = await Coupon.findOne({ userRef: user._id });
+    // console.log(`purchesed menu for which user : ${user}`)
+    console.log(`menu referance : ${menuRef}`)
+
 
     if (couponPurchase) {
       // Check if there's a record for the default purchase date and menuRef
