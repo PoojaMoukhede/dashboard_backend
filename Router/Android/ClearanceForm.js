@@ -5,8 +5,9 @@ const Clearance = require("../../Model/Android/ClearanceForm");
 const format = require('date-fns/format');
 const User = require("../../Model/Android/User");
 const fileUpload = require('express-fileupload');
-const uploadMiddleware = require("../../Middleware/Uploads")
+const {uploadMiddleware, validateFiles} = require("../../Middleware/Uploads")
 const app = express()
+const fs = require('fs');
 app.use(
   fileUpload({
       limits: {
@@ -339,70 +340,63 @@ const calculateCurrentMonthTotals = async () => {
 };
 
 //multiple images 
-// router.post("/form",uploadMiddleware, async (req, res) => {
-//   console.log("Hello form post call");
+// router.post("/uploadmultiple", uploadMiddleware, validateFiles, async (req, res) => {
+//   console.log("Hello from post call");
 //   try {
 //     const userId = req.body.userId;
 //     const user = await User.findOne({ _id: userId });
 //     if (!user) {
 //       return res.status(404).json({ message: "User not found" });
 //     }
-//     const files = req.files;
-//     const imageName = req.body.ImageName;
+
 //     const transportType = req.body.Transport_type;
 //     const Food = parseFloat(req.body.Food) || 0;
 //     const Hotel = parseFloat(req.body.Hotel) || 0;
 //     const Water = parseFloat(req.body.Water) || 0;
 //     const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
-//     if (!req.files) {
+
+//     if (!req.files || req.files.length === 0) {
 //       return res.status(400).json({ message: "No file uploaded" });
 //     }
+
 //     const totalExpense = Food + Hotel + Water + Other_Transport;
 //     let fuelInLiters = 0;
+
 //     if (transportType === "Car" || transportType === "Bike") {
 //       fuelInLiters = req.body.Fuel_in_liters;
 //     }
-//     let clearance_data = await Clearance.findOne({ userRef: user._id });
+
+//     const clearance_data = await Clearance.findOne({ userRef: user._id });
+
+//     const images = req.files.map(file => ({
+//       data: file.buffer,
+//       contentType: file.mimetype,
+//     }));
+
+//     const newFormData = {
+//       Transport_type: transportType,
+//       Food: Food,
+//       Water: Water,
+//       Hotel: Hotel,
+//       Other_Transport: Other_Transport,
+//       Total_expense: totalExpense,
+//       Fuel_in_liters: fuelInLiters,
+//       images: images,
+//       ImageName: req.body.ImageName,
+//       timestamp: new Date(),
+//     };
+
 //     if (clearance_data) {
-//       clearance_data.FormData.push({
-//         Transport_type: transportType,
-//         Food: Food,
-//         Water: Water,
-//         Hotel: Hotel,
-//         Other_Transport: Other_Transport,
-//         Total_expense: totalExpense,
-//         Fuel_in_liters: fuelInLiters,
-//         images: {
-//           data: files.buffer,
-//           contentType: files.mimetype,
-//         },
-//         ImageName: imageName,
-//         timestamp: new Date(),
-//       });
+//       clearance_data.FormData.push(newFormData);
 //       await clearance_data.save();
 //     } else {
-//       clearance_data = new Clearance({
-//         FormData: [
-//           {
-//             Transport_type: transportType,
-//             Food: Food,
-//             Water: Water,
-//             Hotel: Hotel,
-//             Other_Transport: Other_Transport,
-//             Total_expense: totalExpense,
-//             Fuel_in_liters: fuelInLiters,
-//             images: {
-//               data: files.buffer,
-//               contentType: files.mimetype,
-//             },
-//             ImageName: imageName,
-//             timestamp: new Date(),
-//           },
-//         ],
+//       const newClearanceData = new Clearance({
+//         FormData: [newFormData],
 //         userRef: user._id,
 //       });
-//       await clearance_data.save();
+//       await newClearanceData.save();
 //     }
+
 //     res.status(200).json({
 //       status: "Success",
 //       message: "Clearance form added successfully",
@@ -412,12 +406,85 @@ const calculateCurrentMonthTotals = async () => {
 //     console.log(e);
 //   }
 // });
+//-------------------------
+router.post("/uploadmultiple", uploadMiddleware, validateFiles, async (req, res) => {
+  console.log("Hello from post call");
+  try {
+    const userId = req.body.userId;
+    const user = await User.findOne({ _id: userId });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
+    const transportType = req.body.Transport_type;
+    const Food = parseFloat(req.body.Food) || 0;
+    const Hotel = parseFloat(req.body.Hotel) || 0;
+    const Water = parseFloat(req.body.Water) || 0;
+    const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const totalExpense = Food + Hotel + Water + Other_Transport;
+    let fuelInLiters = 0;
+
+    if (transportType === "Car" || transportType === "Bike") {
+      fuelInLiters = req.body.Fuel_in_liters;
+    }
+
+    const clearance_data = await Clearance.findOne({ userRef: user._id });
+
+    const newFormData = {
+      Transport_type: transportType,
+      Food: Food,
+      Water: Water,
+      Hotel: Hotel,
+      Other_Transport: Other_Transport,
+      Total_expense: totalExpense,
+      Fuel_in_liters: fuelInLiters,
+      ImageName: req.body.ImageName,
+      timestamp: new Date(),
+    };
+
+    // Read and store image data
+    const images = req.files.map(file => ({
+      data: fs.readFileSync(file.path),
+      contentType: file.mimetype,
+    }));
+
+    newFormData.images = images;
+
+    if (clearance_data) {
+      clearance_data.FormData.push(newFormData);
+      await clearance_data.save();
+    } else {
+      const newClearanceData = new Clearance({
+        FormData: [newFormData],
+        userRef: user._id,
+      });
+      await newClearanceData.save();
+    }
+
+    // Remove uploaded files
+    req.files.forEach(file => {
+      fs.unlinkSync(file.path);
+    });
+
+    res.status(200).json({
+      status: "Success",
+      message: "Clearance form added successfully",
+    });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+    console.log(e);
+  }
+});
 
 
 //single images
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 const uploadImg = multer({storage: storage}).single('image');
 
 router.post("/form",uploadImg, async (req, res) => {

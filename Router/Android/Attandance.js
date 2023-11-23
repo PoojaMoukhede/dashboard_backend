@@ -12,14 +12,14 @@ const moment = require("moment-timezone");
 router.get("/attendance", async (req, res) => {
   console.log("hello attendance");
   try {
-    const currentLocalDate = moment().tz("Asia/Kolkata").format('YYYY-MM-DD'); // Get the current date in local time
-
+    const currentLocalDate = moment().tz("Asia/Kolkata").format("YYYY-MM-DD"); // Get the current date in local time
+    // const currentLocalDate = new Date().toISOString().slice(0, 10);
     console.log("currentLocalDate:", currentLocalDate);
 
     const attendanceRecords = await Attandance.find({
       Employee_attandance: {
         $gte: new Date(currentLocalDate), // Match dates on and after the current local date
-        $lt: moment(currentLocalDate).add(1, 'days').toDate() // Match dates before the next local day
+        // $lt: moment(currentLocalDate).add(1, 'days').toDate() // Match dates before the next local day
       },
     });
 
@@ -32,9 +32,9 @@ router.get("/attendance", async (req, res) => {
     }
 
     // Check if "2023-11-01" is present in the timestamp of attendance records
-    const matchingRecords = attendanceRecords.filter(record => {
-      return record.Employee_attandance.some(entry => {
-        const entryDate = moment(entry.timestamp).format('YYYY-MM-DD');
+    const matchingRecords = attendanceRecords.filter((record) => {
+      return record.Employee_attandance.some((entry) => {
+        const entryDate = moment(entry.timestamp).format("YYYY-MM-DD");
         return entryDate === currentLocalDate;
       });
     });
@@ -76,7 +76,7 @@ router.get("/attandance/:id", async (req, res) => {
 
 router.put("/attendance/:id", async (req, res) => {
   try {
-    const userId = req.params.id; 
+    const userId = req.params.id;
     console.log(userId);
 
     const user = await User.findOne({ _id: userId });
@@ -287,31 +287,52 @@ router.get("/leave-balance/:id", async (req, res) => {
 });
 
 //department wise attandance
-router.get("/departmentWise", async (req, res) => {
-  const today = new Date().toISOString().slice(0, 10); // Get today's date in ISO format (YYYY-MM-DD)
-  console.log(`today : ${today}`);
-  const department = "Software";
+// router.get("/departmentWise", async (req, res) => {
+//   const today = new Date().toISOString().slice(0, 10); // Get today's date in ISO format (YYYY-MM-DD)
+//   console.log(`today : ${today}`);
+//   const department = "Sales";
+//   // const department = req.query.department
 
+//   try {
+//     const results = await Attandance.find({
+//       "Employee_attandance.timestamp": {
+//         $gte: new Date(today),          // Start of the day
+//         $lt: new Date(today).setHours(23, 59, 59, 999)  // End of the day
+//       },
+//     })
+//       .populate("userRef")
+//       .exec();
+
+//     // Filter the results by department
+//     const filteredResults = results.filter(
+//       (result) => result.userRef.Emp_department === department
+//     );
+//     // console.log(filteredResults);
+
+//     if (filteredResults.length > 0) {
+//       res.json(filteredResults); // Send the first matched document as JSON response
+//     } else {
+//       res.json({ message: "No matching record for today" });
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
+
+router.get("/departmentWise", async (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  // console.log(`------------ ${today}`);
   try {
     const results = await Attandance.find({
       "Employee_attandance.timestamp": {
-        $gte: new Date(today),
-      }, // Today's date
+        $gte: today,
+      },
     })
       .populate("userRef")
       .exec();
 
-    // Filter the results by department
-    const filteredResults = results.filter(
-      (result) => result.userRef.Emp_department === department
-    );
-    console.log(filteredResults);
-
-    if (filteredResults.length > 0) {
-      res.json(filteredResults); // Send the first matched document as JSON response
-    } else {
-      res.json({ message: "No matching record for today" });
-    }
+    res.json(results);
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal Server Error");

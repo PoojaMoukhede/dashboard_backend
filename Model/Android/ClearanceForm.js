@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const clearanceSchema = new mongoose.Schema({
   FormData: [
     {
@@ -10,10 +9,12 @@ const clearanceSchema = new mongoose.Schema({
       Water: { type: String },
       Hotel: { type: String },
       Other_Transport: { type: String },
-      images: {
-        data: Buffer,
-        contentType: String,
-      },
+      images: [
+        {
+          data: { type: Buffer },
+          contentType: { type: String },
+        },
+      ],
       ImageName: { type: String },
       timestamp: { type: Date, default: Date.now },
     },
@@ -23,3 +24,4 @@ const clearanceSchema = new mongoose.Schema({
 
 const Clearance = mongoose.model("clearances", clearanceSchema);
 module.exports = Clearance;
+
