@@ -10,34 +10,29 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
 
-// Both Checked
-// router.get('/getlocation', async (req, res) => {  
-//   console.log("hello Location get call")
-//     if (req.headers.token !== null) {
-//         jwt.verify(req.headers.token, secret, (err, user) => {
-//           if (err) console.log(err.message);
-//           else req.user = user.data;
-//         });
-//         try {
-//           const data = await Location.find({ userRef: req.user });
-//           res.status(200).json({
-//             status: "Sucess",
-//             message: data,
-//           });
-//         } catch (error) {
-//           res.status(500).json({
-//             status: "Failed",
-//             message: error.message,
-//           });
-//         }
-//       } else {
-//         res.status(500).json({
-//           status: "Failed",
-//           message: "Please Refresh the Page",
-//         });
-//       }
-    
-   
+// router.get("/location", async (req, res) => {
+//   const today = new Date().toISOString().slice(0, 10);
+//   try {
+//     // Find locations for today
+//     const locations = await Location.find({
+//       "Location_info.timestamp": {
+//         $gte:today,
+//       },
+//     })
+
+//     .populate("userRef")
+//       .exec();
+
+//     res.json(locations);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
+
+
+
+  
 // })
 router.get('/location', async (req, res) => {
   try {
