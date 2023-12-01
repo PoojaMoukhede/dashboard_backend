@@ -201,6 +201,7 @@ router.get('/updates', async (req, res) => {
           Emp_name: user.Emp_name,
           date: `${dob.getDate()}/${currentMonth}/${currentYear}`,
           type: 'birthday',
+          email:user.email
         });
       }
 
@@ -210,6 +211,7 @@ router.get('/updates', async (req, res) => {
           Emp_name: user.Emp_name,
           date: `${joinDate.getDate()}/${currentMonth}/${currentYear}`,
           type: 'work anniversary',
+          email:user.email
         });
       }
     });

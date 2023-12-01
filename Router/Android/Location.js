@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const Location = require("../../Model/Android/Location")
-const jwt = require("jsonwebtoken")
-const secret ="SECRET"
 const User = require("../../Model/Android/User")
 
 
@@ -10,47 +8,45 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
 
-// router.get("/location", async (req, res) => {
-//   const today = new Date().toISOString().slice(0, 10);
-//   try {
-//     // Find locations for today
-//     const locations = await Location.find({
-//       "Location_info.timestamp": {
-//         $gte:today,
-//       },
-//     })
-
-//     .populate("userRef")
-//       .exec();
-
-//     res.json(locations);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Internal Server Error");
-//   }
-// });
-
-
-
-  
-// })
-router.get('/location', async (req, res) => {
+router.get("/location", async (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  console.log(`------------ ${today}`);
   try {
-    // Find all location records in the Location collection
-    const locations = await Location.find({});
+    // Find locations for today
+    const locations = await Location.find({
+      "Location_info.timestamp": {
+        $gte:today,
+      },
+    })
 
-    // Map the results to extract location data
-    const locationData = locations.map(location => ({
-      userId: location.userRef,
-      locationInfo: location.Location_info
-    }));
+    .populate("userRef")
+      .exec();
 
-    res.status(200).json(locationData);
-  } catch (error) {
-    console.error('Error fetching location data:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.json(locations);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
   }
 });
+
+
+// router.get('/location', async (req, res) => {
+//   try {
+//     // Find all location records in the Location collection
+//     const locations = await Location.find({});
+
+//     // Map the results to extract location data
+//     const locationData = locations.map(location => ({
+//       userId: location.userRef,
+//       locationInfo: location.Location_info
+//     }));
+
+//     res.status(200).json(locationData);
+//   } catch (error) {
+//     console.error('Error fetching location data:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
 
 router.get("/location/:id", async (req, res) => {
   console.log("hello Location get id call")

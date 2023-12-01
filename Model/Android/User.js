@@ -9,12 +9,12 @@ const userSchema = new mongooose.Schema({
   Emp_department: { type: String},
   Emp_city: { type: String},
   Emp_state: { type: String},
+  Emp_country:{type:String},
   Emp_DOB: { type: String},
   Emp_joining_date: { type: String},
   Emp_blood_group:{type:String},
   Emp_qualification:{type:String},
   Emp_expertise:{type:String},
-  Emp_country:{type:String},
   Emp_designation:{type:String},
   profileImage: {
     data: Buffer,
