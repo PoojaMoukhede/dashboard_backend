@@ -45,8 +45,6 @@ router.post(
       return true;
     }),
   async (req, res) => {
-    // User.init()
-    console.log("hello register");
     try {
       const existingUser = await User.findOne({ Emp_ID: req.body.Emp_ID });
       if (existingUser) {
@@ -103,7 +101,6 @@ router.post(
           error: "User Already Exists",
         });
       }
-      console.log("data from android", req.body);
     } catch (error) {
       res.status(500).json({
         status: "Failed",
@@ -117,7 +114,6 @@ router.post("/emplogin", async (req, res) => {
   const email = req.body.email;
   const Emp_ID = req.body.Emp_ID;
   const password = req.body.password;
-  console.log("hello login");
 
   try {
     const userData = await User.findOne({ email: email });
@@ -143,7 +139,6 @@ router.post("/emplogin", async (req, res) => {
           status: "Successful",
           userId: userData._id,
         });
-        // console.log(`user : ${User}`);
       } else {
         res.status(401).json({
           status: "failed",
@@ -167,7 +162,6 @@ router.post("/emplogin", async (req, res) => {
 
 //getting all user
 router.get("/empdata", async (req, res) => {
-  console.log("get request by android");
   try {
     const results = await User.find();
     res.json(results);
@@ -180,7 +174,6 @@ router.get("/empdata", async (req, res) => {
 
 // for birthday and work anniversary updated 
 router.get('/updates', async (req, res) => {
-  console.log('get request by android');
   try {
     const users = await User.find();
 
@@ -222,7 +215,6 @@ router.get('/updates', async (req, res) => {
     };
 
     res.json(response);
-    // console.log('Users with birthdays and work anniversaries in the current month:', response);
   } catch (e) {
     res.status(400).json({ message: e.message });
     console.log(e);

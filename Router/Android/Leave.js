@@ -6,7 +6,6 @@ const LeaveBalance = require("../../Model/Android/LeaveBalance");
 const Notification = require('../../Model/Web/Notification')
 
 router.post("/leave/:id", async (req, res) => {
-  console.log("POST CALL LEAVE");
   try {
     const userId = req.params.id;
     const user = await User.findOne({ _id: userId });
@@ -64,7 +63,6 @@ router.put("/leave/:id", async (req, res) => {
   try {
     const requestId = req.params.id;
     const { status } = req.body;
-    console.log(`requestId: ${requestId} -- status: ${status}`);
 
     const updatedLeave = await Leave.findOne({ "Leave_info._id": requestId });
 
@@ -134,7 +132,6 @@ router.put("/leave/:id", async (req, res) => {
 // Employee and Admin can view all leave requests (GET request)
 router.get("/leave", async (req, res) => {
   try {
-    console.log("leave call")
     const leaveApplications = await Leave.find({}).populate("userRef");
 
     res.json(leaveApplications);
@@ -147,7 +144,6 @@ router.get("/leave", async (req, res) => {
 router.get("/leave/:id", async (req, res) => {
 
   try {
-    console.log("leave by id call")
     const userId = req.params.id;
     const user = await User.findOne({ _id: userId });
 
@@ -170,7 +166,6 @@ router.get("/leave/:id", async (req, res) => {
     );
 
     res.json({
-      // user: user,
       totalNumberOfDays: totalNumberOfDays,
       leaveApplications: leaveApplications.Leave_info,
     });

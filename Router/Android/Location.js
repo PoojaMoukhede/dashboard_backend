@@ -10,7 +10,6 @@ router.use(express.urlencoded({ extended: true }));
 
 router.get("/location", async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
-  console.log(`------------ ${today}`);
   try {
     // Find locations for today
     const locations = await Location.find({
@@ -30,26 +29,8 @@ router.get("/location", async (req, res) => {
 });
 
 
-// router.get('/location', async (req, res) => {
-//   try {
-//     // Find all location records in the Location collection
-//     const locations = await Location.find({});
-
-//     // Map the results to extract location data
-//     const locationData = locations.map(location => ({
-//       userId: location.userRef,
-//       locationInfo: location.Location_info
-//     }));
-
-//     res.status(200).json(locationData);
-//   } catch (error) {
-//     console.error('Error fetching location data:', error);
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// });
 
 router.get("/location/:id", async (req, res) => {
-  console.log("hello Location get id call")
   try {
     const empId = req.params.id;
     const user = await User.findOne({ _id: empId });
@@ -95,7 +76,6 @@ router.get('/total-distance', async(req, res) => {
 
 
 router.post("/location/:id", async (req, res) => {
-  console.log("pOST CALL LOCATION")
   try {
     
     const userId = req.params.id;

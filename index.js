@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const route = require("./Router/Web/Admin");
 const e_route = require("./Router/Web/AddEmployee");
-const m_route = require("./Router/Web/Manager");
 const event_route = require("./Router/Web/Event");
 const Leave_route = require("./Router/Android/Leave");
 const notification = require("./Router/Web/Notification");
@@ -18,8 +17,10 @@ const Clearance_form = require("./Router/Android/ClearanceForm");
 const Attandance = require("./Router/Android/Attandance");
 const Location = require("./Router/Android/Location");
 const Complaint = require("./Router/Android/Complaint");
-// const LatLong = require('./Router/Android/LatLong')
 const uploadMiddleware = require("./Middleware/Uploads");
+const Customer = require("./Router/Android/Customer")
+const CompanyProperty = require('./Router/Android/CompanyProperty')
+
 require("request").defaults({ rejectUnauthorized: false });
 
 const cors = require("cors");
@@ -48,8 +49,7 @@ app.use(
     type: "application/x-www-form-urlencoding",
   })
 );
-// app.use(bodyParser.urlencoded({ extended: true}));
-// app.use(bodyParser.json());
+
 app.use(express.urlencoded({ limit: "50mb" }));
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -58,7 +58,6 @@ app.use((req, res, next) => {
 
 app.use("/", route);
 app.use("/", e_route);
-app.use("/", m_route);
 app.use("/", event_route);
 app.use("/", canteen_route);
 app.use("/", notification);
@@ -70,7 +69,8 @@ app.use("/", Attandance);
 app.use("/", Location);
 app.use("/", Complaint);
 app.use("/", Leave_route);
-// app.use('/', LatLong);
+app.use('/', Customer)
+app.use('/',CompanyProperty)
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

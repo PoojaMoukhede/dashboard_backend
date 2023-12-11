@@ -9,7 +9,8 @@ const clearanceSchema = new mongoose.Schema({
       Water: { type: String },
       Hotel: { type: String },
       Other_Transport: { type: String },
-      images: [
+      images: 
+      [
         {
           data: { type: Buffer },
           contentType: { type: String },

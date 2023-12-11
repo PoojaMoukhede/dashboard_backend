@@ -37,10 +37,8 @@ router.post("/menu", async (req, res) => {
 router.get("/menu", async (req, res) => {
   try {
     // Use Kolkata time (IST)
-    console.log("Get menu api call");
     const now = moment().tz("Asia/Kolkata");
     const today = now.clone().startOf("day");
-    // console.log(today);
     const tomorrow = now.clone().add(1, "days").startOf("day");
 
     const todayMenu = await Canteen.findOne({ date: today.toDate() });
@@ -84,7 +82,6 @@ cron.schedule("0 0 * * *", async () => {
 
 // coupon purchesed count and post, update, delete
 router.post("/menu/buy", async (req, res) => {
-  console.log("Hello Menu Buy POST call");
   try {
     const { userId, numberOfCoupons, menuRef } = req.body;
     const user = await User.findOne({ _id: userId });
@@ -94,9 +91,6 @@ router.post("/menu/buy", async (req, res) => {
     }
 
     let couponPurchase = await Coupon.findOne({ userRef: user._id });
-    // console.log(`purchesed menu for which user : ${user}`)
-    console.log(`menu referance : ${menuRef}`)
-
 
     if (couponPurchase) {
       // Check if there's a record for the default purchase date and menuRef
@@ -175,41 +169,6 @@ router.get("/coupon-count-by-menu", async (req, res) => {
   }
 });
 
-// router.get("/coupon-count-by-menu", async (req, res) => {
-//   try {
-//     const coupons = await Coupon.find(); // Assuming your model is named "Coupon"
-    
-//     // Create an object to store coupon counts by menu
-//     const couponCountsByMenu = {};
-
-//     // Loop through the coupons and count them by menu
-//     coupons.forEach(coupon => {
-//       if (coupon.Coupon_Count) {
-//         coupon.Coupon_Count.forEach(couponCount => {
-//           const menuRef = couponCount.menuRef;
-//           const numberOfCoupons = couponCount.numberOfCoupons;
-          
-//           if (!couponCountsByMenu[menuRef]) {
-//             couponCountsByMenu[menuRef] = 0;
-//           }
-//           couponCountsByMenu[menuRef] += numberOfCoupons;
-//         });
-//       }
-//     });
-
-//     // Convert the object into an array of objects
-//     const result = Object.keys(couponCountsByMenu).map(menuRef => ({
-//       menuRef,
-//       totalCoupons: couponCountsByMenu[menuRef],
-//     }));
-    
-//     console.log("Coupon count by menu:", result);
-//     res.json(result);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
 
  async function getCouponSumByUserId(userId) {
   try {

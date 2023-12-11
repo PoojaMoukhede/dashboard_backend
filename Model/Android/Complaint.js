@@ -12,7 +12,6 @@ const complaintSchema = new mongooose.Schema(
     userRef: { type: mongooose.Schema.Types.ObjectId, ref: "users" },
     
   },
-  // { timestamps: true }
 );
 
 const Complaint = mongooose.model("complaints", complaintSchema);

@@ -23,7 +23,6 @@ app.use(express.static('public'));
 // Both Checked
 // GET all clearances
 router.get("/form", async (req, res) => {
-  console.log("hello clearance get call");
   try {
     const formRecord = await Clearance.find();
 
@@ -41,91 +40,8 @@ router.get("/form", async (req, res) => {
   }
 });
 
-// here i am sending fuel conditional based
-// router.post("/form",uploadImg, async (req, res) => {
-//   console.log("Hello form post call");
-//   try {
-//     const userId = req.body.userId;
-//     const user = await User.findOne({ _id: userId });
-
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     const image = req.files;
-//     const imageName = req.body.ImageName;
-//     const transportType = req.body.Transport_type;
-//     const Food = parseFloat(req.body.Food) || 0;
-//     const Hotel = parseFloat(req.body.Hotel) || 0;
-//     const Water = parseFloat(req.body.Water) || 0;
-//     const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
-
-//     if (!req.files) {
-//       return res.status(400).json({ message: "No file uploaded" });
-//     }
-
-//     const totalExpense = Food + Hotel + Water + Other_Transport;
-//     let fuelInLiters = 0;
-
-//     if (transportType === "Car" || transportType === "Bike") {
-//       fuelInLiters = totalExpense;
-//     }
-
-//     let clearance_data = await Clearance.findOne({ userRef: user._id });
-
-//     if (clearance_data) {
-//       clearance_data.FormData.push({
-//         Transport_type: transportType,
-//         Food: Food,
-//         Water: Water,
-//         Hotel: Hotel,
-//         Other_Transport: Other_Transport,
-//         Total_expense: totalExpense,
-//         Fuel_in_liters: fuelInLiters,
-//         images: {
-//           data: image.buffer,
-//           contentType: image.mimetype,
-//         },
-//         ImageName: imageName,
-//         timestamp: new Date(),
-//       });
-//       await clearance_data.save();
-//     } else {
-//       clearance_data = new Clearance({
-//         FormData: [
-//           {
-//             Transport_type: transportType,
-//             Food: Food,
-//             Water: Water,
-//             Hotel: Hotel,
-//             Other_Transport: Other_Transport,
-//             Total_expense: totalExpense,
-//             Fuel_in_liters: fuelInLiters,
-//             images: {
-//               data: image.buffer,
-//               contentType: image.mimetype,
-//             },
-//             ImageName: imageName,
-//             timestamp: new Date(),
-//           },
-//         ],
-//         userRef: user._id,
-//       });
-//       await clearance_data.save();
-//     }
-
-//     res.status(200).json({
-//       status: "Success",
-//       message: "Clearance form added successfully",
-//     });
-//   } catch (e) {
-//     res.status(400).json({ message: e.message });
-//     console.log(e);
-//   }
-// });
 
 router.get("/form/:id", async (req, res) => {
-  console.log("hello form get ID call");
   try {
     const userId = req.params.id;
     const user = await User.findOne({ _id: userId });
@@ -162,7 +78,6 @@ router.get("/form/:id", async (req, res) => {
 
 
 router.get("/totalExpenses", async (req, res) => {
-  console.log("hello total expenses call");
   try {
     const users = await User.find();
     let totalAllExpenses = 0;
@@ -189,6 +104,7 @@ router.get("/totalExpenses", async (req, res) => {
   }
 });
 
+//in use for render in chart on dashboard
 router.get('/totalMonthlyExpenses', async (req, res) => {
   try {
     const users = await User.find();
@@ -206,6 +122,8 @@ router.get('/totalMonthlyExpenses', async (req, res) => {
             if (!totalExpensesByMonth[formattedMonth]) {
               totalExpensesByMonth[formattedMonth] = 0;
             }
+
+            // Calculate fuel price and add it to Total_expense
             totalExpensesByMonth[formattedMonth] += parseFloat(formData.Total_expense);
           }
         });
@@ -224,9 +142,9 @@ router.get('/totalMonthlyExpenses', async (req, res) => {
   }
 });
 
+
 // total fuel 
 router.get("/totalFuel", async (req, res) => {
-  console.log("hello total fuel call");
   try {
     const users = await User.find();
     let totalAllFuel = 0;
@@ -288,10 +206,11 @@ router.get('/totalFuelByMonth', async (req, res) => {
   }
 });
 
+// in use to get total data from start to this
 router.get('/current-month-totals', async (req, res) => {
   try {
     const totals = await calculateCurrentMonthTotals();
-    // console.log(`totals : ${totals}`)
+    console.log(`totals : ${totals}`)
     res.json(totals);
   } catch (error) {
     console.error(error);
@@ -328,87 +247,88 @@ const calculateCurrentMonthTotals = async () => {
       totals.Transport_type[formData.Transport_type] =
         (totals.Transport_type[formData.Transport_type] || 0) + 1;
       totals.Total_expense += parseFloat(formData.Total_expense) || 0;
-      totals.Fuel_in_liters += parseFloat(formData.Fuel_in_liters) || 0;
+    
+
       totals.Food += parseFloat(formData.Food) || 0;
       totals.Water += parseFloat(formData.Water) || 0;
       totals.Hotel += parseFloat(formData.Hotel) || 0;
       totals.Other_Transport += parseFloat(formData.Other_Transport) || 0;
+      totals.Fuel_in_liters += parseFloat(formData.Fuel_in_liters) || 0;
     });
   });
 
   return totals;
 };
 
-//multiple images 
-// router.post("/uploadmultiple", uploadMiddleware, validateFiles, async (req, res) => {
-//   console.log("Hello from post call");
-//   try {
-//     const userId = req.body.userId;
-//     const user = await User.findOne({ _id: userId });
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
 
-//     const transportType = req.body.Transport_type;
-//     const Food = parseFloat(req.body.Food) || 0;
-//     const Hotel = parseFloat(req.body.Hotel) || 0;
-//     const Water = parseFloat(req.body.Water) || 0;
-//     const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
+router.get('/monthlyExpenses', async (req, res) => {
+  try {
+    const users = await User.find();
+    const monthlyExpenses = {
+      Food: {},
+      Water: {},
+      Hotel: {},
+      Other_Transport: {},
+      Fuel_in_liters: {},
+      fuel_expense: {},
+      total_expanse: {},
+    };
 
-//     if (!req.files || req.files.length === 0) {
-//       return res.status(400).json({ message: "No file uploaded" });
-//     }
+    for (const user of users) {
+      const Record = await Clearance.findOne({ userRef: user._id });
 
-//     const totalExpense = Food + Hotel + Water + Other_Transport;
-//     let fuelInLiters = 0;
+      if (Record) {
+        Record.FormData.forEach((formData) => {
+          if (formData.timestamp) {
+            const date = new Date(formData.timestamp);
+            const formattedMonth = format(date, 'MMMM');
 
-//     if (transportType === "Car" || transportType === "Bike") {
-//       fuelInLiters = req.body.Fuel_in_liters;
-//     }
+            // Initialize monthly totals if not already present
+            for (const category of Object.keys(monthlyExpenses)) {
+              if (!monthlyExpenses[category][formattedMonth]) {
+                monthlyExpenses[category][formattedMonth] = 0;
+              }
+            }
 
-//     const clearance_data = await Clearance.findOne({ userRef: user._id });
+            // Accumulate expenses for each category
+            monthlyExpenses.Food[formattedMonth] += parseFloat(formData.Food) || 0;
+            monthlyExpenses.Water[formattedMonth] += parseFloat(formData.Water) || 0;
+            monthlyExpenses.Hotel[formattedMonth] += parseFloat(formData.Hotel) || 0;
+            monthlyExpenses.Other_Transport[formattedMonth] += parseFloat(formData.Other_Transport) || 0;
+            monthlyExpenses.Fuel_in_liters[formattedMonth] += parseFloat(formData.Fuel_in_liters) || 0;
+            monthlyExpenses.fuel_expense[formattedMonth] += parseFloat(formData.Fuel_in_liters) * 95 || 0;
 
-//     const images = req.files.map(file => ({
-//       data: file.buffer,
-//       contentType: file.mimetype,
-//     }));
+            // Calculate total expanse for each category
+            monthlyExpenses.total_expanse[formattedMonth] +=
+              parseFloat(formData.Food) +
+              parseFloat(formData.Water) +
+              parseFloat(formData.Hotel) +
+              parseFloat(formData.Other_Transport) +
+              parseFloat(formData.Fuel_in_liters) * 95 || 0;
+          }
+        });
+      }
+    }
 
-//     const newFormData = {
-//       Transport_type: transportType,
-//       Food: Food,
-//       Water: Water,
-//       Hotel: Hotel,
-//       Other_Transport: Other_Transport,
-//       Total_expense: totalExpense,
-//       Fuel_in_liters: fuelInLiters,
-//       images: images,
-//       ImageName: req.body.ImageName,
-//       timestamp: new Date(),
-//     };
+    // Format the response
+    const formattedMonthlyExpenses = {};
+    for (const category of Object.keys(monthlyExpenses)) {
+      formattedMonthlyExpenses[category] = Object.keys(monthlyExpenses[category]).map((month) => ({
+        month,
+        total: monthlyExpenses[category][month],
+      }));
+    }
 
-//     if (clearance_data) {
-//       clearance_data.FormData.push(newFormData);
-//       await clearance_data.save();
-//     } else {
-//       const newClearanceData = new Clearance({
-//         FormData: [newFormData],
-//         userRef: user._id,
-//       });
-//       await newClearanceData.save();
-//     }
+    res.status(200).json(formattedMonthlyExpenses);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+    console.error(e);
+  }
+});
 
-//     res.status(200).json({
-//       status: "Success",
-//       message: "Clearance form added successfully",
-//     });
-//   } catch (e) {
-//     res.status(400).json({ message: e.message });
-//     console.log(e);
-//   }
-// });
-//-------------------------
+
+
 router.post("/uploadmultiple", uploadMiddleware, validateFiles, async (req, res) => {
-  console.log("Hello from post call");
   try {
     const userId = req.body.userId;
     const user = await User.findOne({ _id: userId });
@@ -422,17 +342,18 @@ router.post("/uploadmultiple", uploadMiddleware, validateFiles, async (req, res)
     const Water = parseFloat(req.body.Water) || 0;
     const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
 
+
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const totalExpense = Food + Hotel + Water + Other_Transport;
     let fuelInLiters = 0;
 
     if (transportType === "Car" || transportType === "Bike") {
       fuelInLiters = req.body.Fuel_in_liters;
     }
 
+    const totalExpense = Food + Hotel + Water + Other_Transport + fuelInLiters *95;
     const clearance_data = await Clearance.findOne({ userRef: user._id });
 
     const newFormData = {
@@ -484,11 +405,9 @@ router.post("/uploadmultiple", uploadMiddleware, validateFiles, async (req, res)
 
 //single images
 const storage = multer.memoryStorage();
-// const upload = multer({ storage: storage });
 const uploadImg = multer({storage: storage}).single('image');
 
 router.post("/form",uploadImg, async (req, res) => {
-  console.log("Hello form post call");
   try {
     const userId = req.body.userId;
     const user = await User.findOne({ _id: userId });
@@ -509,11 +428,13 @@ router.post("/form",uploadImg, async (req, res) => {
     }
 
 
-    const totalExpense = Food + Hotel + Water + Other_Transport;
     let fuelInLiters = 0;
+
     if (transportType === "Car" || transportType === "Bike") {
       fuelInLiters = req.body.Fuel_in_liters;
     }
+    
+    const totalExpense = Food + Hotel + Water + Other_Transport + fuelInLiters *95;
     let clearance_data = await Clearance.findOne({ userRef: user._id });
     if (clearance_data) {
       clearance_data.FormData.push({
@@ -532,8 +453,7 @@ router.post("/form",uploadImg, async (req, res) => {
         timestamp: new Date(),
       });
       await clearance_data.save();
-      console.log(`req.file : ${req.file.size}`)
-      console.log(`clearance_data if : ${clearance_data}`)
+
 
     } else {
       clearance_data = new Clearance({
@@ -557,7 +477,6 @@ router.post("/form",uploadImg, async (req, res) => {
         userRef: user._id,
       });
       await clearance_data.save();
-      console.log(`clearance_data else : ${clearance_data}`)
 
     }
     res.status(200).json({
@@ -569,67 +488,5 @@ router.post("/form",uploadImg, async (req, res) => {
     console.log(e);
   }
 });
-
-// router.post("/form", uploadImg, async (req, res) => {
-//   console.log("Hello form post call");
-//   try {
-//     const userId = req.body.userId;
-//     const user = await User.findOne({ _id: userId });
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     const transportType = req.body.Transport_type;
-//     const Food = parseFloat(req.body.Food) || 0;
-//     const Hotel = parseFloat(req.body.Hotel) || 0;
-//     const Water = parseFloat(req.body.Water) || 0;
-//     const Other_Transport = parseFloat(req.body.Other_Transport) || 0;
-//     const imageName = req.body.ImageName;
-
-//     const formData = {
-//       Transport_type: transportType,
-//       Food: Food,
-//       Water: Water,
-//       Hotel: Hotel,
-//       Other_Transport: Other_Transport,
-//       Total_expense: Food + Hotel + Water + Other_Transport,
-//       timestamp: new Date(),
-//     };
-
-//     if (transportType === "Car" || transportType === "Bike") {
-//       formData.Fuel_in_liters = req.body.Fuel_in_liters;
-//     }
-
-//     if (req.file) {
-//       formData.images = {
-//         data: req.file.buffer,
-//         contentType: req.file.mimetype,
-//       };
-//       formData.ImageName = imageName;
-//     }
-// console.log(` req.file : ${req.file.size}`)
-//     let clearance_data = await Clearance.findOne({ userRef: user._id });
-//     if (clearance_data) {
-//       clearance_data.FormData.push(formData);
-//     } else {
-//       clearance_data = new Clearance({
-//         FormData: [formData],
-//         userRef: user._id,
-//       });
-//     }
-
-//     await clearance_data.save();
-
-//     res.status(200).json({
-//       status: "Success",
-//       message: "Clearance form added successfully",
-//     });
-//   } catch (e) {
-//     res.status(400).json({ message: e.message });
-//     console.log(e);
-//   }
-// });
-
-
 
 module.exports = router;

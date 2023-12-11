@@ -4,26 +4,19 @@ const Attandance = require("../../Model/Android/Attandance");
 const User = require("../../Model/Android/User");
 const LeaveBalance = require("../../Model/Android/LeaveBalance");
 
-// Both checked
-// get according to date
 
 const moment = require("moment-timezone");
 
 router.get("/attendance", async (req, res) => {
-  console.log("hello attendance");
   try {
     const currentLocalDate = moment().tz("Asia/Kolkata").format("YYYY-MM-DD"); // Get the current date in local time
-    // const currentLocalDate = new Date().toISOString().slice(0, 10);
-    console.log("currentLocalDate:", currentLocalDate);
 
     const attendanceRecords = await Attandance.find({
       Employee_attandance: {
         $gte: new Date(currentLocalDate), // Match dates on and after the current local date
-        // $lt: moment(currentLocalDate).add(1, 'days').toDate() // Match dates before the next local day
       },
     });
 
-    console.log("attendanceRecords:", attendanceRecords);
 
     if (!attendanceRecords || attendanceRecords.length === 0) {
       return res
@@ -50,7 +43,6 @@ router.get("/attendance", async (req, res) => {
 });
 
 router.get("/attandance/:id", async (req, res) => {
-  console.log("hello attandance get ID call");
 
   try {
     const userId = req.params.id; //mongo
@@ -77,7 +69,6 @@ router.get("/attandance/:id", async (req, res) => {
 router.put("/attendance/:id", async (req, res) => {
   try {
     const userId = req.params.id;
-    console.log(userId);
 
     const user = await User.findOne({ _id: userId });
 
@@ -105,7 +96,6 @@ router.put("/attendance/:id", async (req, res) => {
 });
 
 router.post("/attendance", async (req, res) => {
-  console.log("Hello attendance post call");
 
   try {
     const userId = req.body.userId;
@@ -125,7 +115,6 @@ router.post("/attendance", async (req, res) => {
     }
 
     const isPunchIn = req.body.isPunchIn;
-    // const timer = req.body.timer;
 
     let totalWorkedHours = 0;
 
@@ -175,46 +164,7 @@ router.post("/attendance", async (req, res) => {
         // Check if the user missed a Punch In
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        // const missedPunchIn = await Attandance.findOne({
-        //   userRef: user._id,
-        //   "Employee_attandance.action": "Punch In",
-        //   "Employee_attandance.timestamp": { $lt: today },
-        // });
-
-        // if (missedPunchIn) {
-        //   if (today.getDay() === 0) {
-        //     // It's a Sunday, set the status as "Sunday" with the date
-        //     attendance.Employee_attandance.push({
-        //       action: "Sunday",
-        //       Emp_status: "Sunday",
-        //       timer: 0,
-        //       timestamp: today,
-        //     });
-        //   }
-        //   // Check if today is not a Sunday === 0 , & deduct leave for missed punch
-        //   if (today.getDay() !== 0) {
-        //     const leaveBalance = await LeaveBalance.findOne({
-        //       userRef: user._id,
-        //     });
-        //     if (leaveBalance) {
-        //       // Deduct a certain amount of leave
-        //       const daysToDeduct = 1;
-        //       leaveBalance.availableLeave -= daysToDeduct;
-
-        //       await leaveBalance.save();
-        //     }
-        //     console.log(`leave balance : ${leaveBalance}`)
-        //   }
-
-        //   // Update the missed punch entry
-        //   missedPunchIn.Employee_attandance.push({
-        //     action: "Misspunch Out",
-        //     Emp_status: "Misspunch Out",
-        //     timer: 0,
-        //     timestamp: new Date(),
-        //   });
-        //   await missedPunchIn.save();
-        // }
+       
       } else {
         // Check if today is not a Sunday & deduct leave for not punching in
         if (today.getDay() !== 0) {
@@ -271,7 +221,6 @@ router.get("/leave-balance/:id", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     const leave = await LeaveBalance.findOne({ userRef: user._id });
-    console.log(`Employee LeaveBalance : ${leave}`);
 
     if (!leave) {
       return res.status(404).json({ message: "leave record not found" });
@@ -286,43 +235,10 @@ router.get("/leave-balance/:id", async (req, res) => {
   }
 });
 
-//department wise attandance
-// router.get("/departmentWise", async (req, res) => {
-//   const today = new Date().toISOString().slice(0, 10); // Get today's date in ISO format (YYYY-MM-DD)
-//   console.log(`today : ${today}`);
-//   const department = "Sales";
-//   // const department = req.query.department
 
-//   try {
-//     const results = await Attandance.find({
-//       "Employee_attandance.timestamp": {
-//         $gte: new Date(today),          // Start of the day
-//         $lt: new Date(today).setHours(23, 59, 59, 999)  // End of the day
-//       },
-//     })
-//       .populate("userRef")
-//       .exec();
-
-//     // Filter the results by department
-//     const filteredResults = results.filter(
-//       (result) => result.userRef.Emp_department === department
-//     );
-//     // console.log(filteredResults);
-
-//     if (filteredResults.length > 0) {
-//       res.json(filteredResults); // Send the first matched document as JSON response
-//     } else {
-//       res.json({ message: "No matching record for today" });
-//     }
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Internal Server Error");
-//   }
-// });
 
 router.get("/departmentWise", async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
-  // console.log(`------------ ${today}`);
   try {
     const results = await Attandance.find({
       "Employee_attandance.timestamp": {
