@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Customer = require("../../Model/Android/Customer");
-
+const { body, validationResult } = require("express-validator");
 
 router.get("/customer", async (req, res) => {
   try {
@@ -19,7 +19,7 @@ router.get("/customer/:id", async (req, res) => {
   try {
     const customer = await Customer.findById(customerId);
 
-    if (!customer) {
+    if (!customer) { 
       return res.status(404).json({ message: "Customer not found" });
     }
 
@@ -31,7 +31,9 @@ router.get("/customer/:id", async (req, res) => {
 });
 
 
-router.post("/customer", async (req, res) => {
+router.post("/customer",body('customerPhone')
+.matches(/^\d{10}$/) 
+.withMessage('Phone number must be a 10-digit numeric value'), async (req, res) => {
   try {
     let customer_data = await Customer.create({
       ...req.body,

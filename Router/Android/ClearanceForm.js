@@ -210,7 +210,7 @@ router.get('/totalFuelByMonth', async (req, res) => {
 router.get('/current-month-totals', async (req, res) => {
   try {
     const totals = await calculateCurrentMonthTotals();
-    console.log(`totals : ${totals}`)
+    // console.log(`totals : ${totals}`)
     res.json(totals);
   } catch (error) {
     console.error(error);

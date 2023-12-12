@@ -8,6 +8,7 @@ const event_route = require("./Router/Web/Event");
 const Leave_route = require("./Router/Android/Leave");
 const notification = require("./Router/Web/Notification");
 const canteen_route = require("./Router/Web/Canteen");
+const salary = require('./Router/Web/Salary')
 const nodemailer = require("nodemailer");
 const path = require("path");
 
@@ -61,6 +62,7 @@ app.use("/", e_route);
 app.use("/", event_route);
 app.use("/", canteen_route);
 app.use("/", notification);
+app.use('/',salary)
 
 // Android
 app.use("/", Android_user);

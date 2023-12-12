@@ -161,7 +161,6 @@ router.get("/coupon-count-by-menu", async (req, res) => {
         },
       },
     ]);
-    console.log(`count coupon ${couponCountsByMenu.totalCoupons}`);
     res.json(couponCountsByMenu);
   } catch (err) {
     console.error(err);
